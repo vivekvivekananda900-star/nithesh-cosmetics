@@ -12,7 +12,7 @@ import {
 
 import { db } from "@/app/lib/firebase";
 
-import { generateInvoice } from "@/app/utils/generateInvoice";
+import { generateInvoice } from "@/app/lib/generateInvoice";
 
 
 export default function CheckoutPage() {
