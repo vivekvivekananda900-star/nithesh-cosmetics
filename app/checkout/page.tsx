@@ -2,170 +2,308 @@
 
 import { useState } from "react";
 import { useCart } from "@/app/context/CartContext";
-import { db, auth } from "@/app/lib/firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { useRouter } from "next/navigation";
-import { generateInvoice } from "@/app/lib/generateInvoice";
+
 
 export default function CheckoutPage() {
-  const { cart, clearCart } = useCart();
+
+
+  const {
+    cart,
+    clearCart,
+  } = useCart();
+
+
   const router = useRouter();
 
-  const [name, setName] = useState("");
-  const [address, setAddress] = useState("");
-  const [phone, setPhone] = useState("");
-  const [loading, setLoading] = useState(false);
 
-  const total = cart.reduce(
-    (sum: number, item: any) => sum + item.price * item.qty,
-    0
-  );
 
-  const placeOrder = async () => {
-    if (!name || !address || !phone) {
-      alert("Please fill all details");
-      return;
-    }
+  const [name, setName] =
+    useState("");
 
-    if (cart.length === 0) {
-      alert("Cart is empty");
-      return;
-    }
+  const [phone, setPhone] =
+    useState("");
 
-    const user = auth.currentUser;
+  const [address, setAddress] =
+    useState("");
 
-    if (!user) {
-      alert("Please login first");
-      router.push("/login");
-      return;
-    }
 
-    try {
-      setLoading(true);
 
-      const docRef = await addDoc(collection(db, "orders"), {
-        userId: user.uid,
-        email: user.email,
-        customer: {
-          name,
-          phone,
-          address,
-        },
-        items: cart,
-        total,
-        paymentMethod: "Cash on Delivery",
-        status: "pending",
-        createdAt: serverTimestamp(),
-      });
 
-      generateInvoice(
-        docRef.id,
-        {
-          name,
-          phone,
-          address,
-        },
-        cart,
-        total
+
+  const total =
+    cart.reduce(
+      (sum, item) =>
+        sum +
+        item.price *
+          item.quantity,
+      0
+    );
+
+
+
+
+
+
+  const placeOrder = () => {
+
+
+    if (
+      !name ||
+      !phone ||
+      !address
+    ) {
+
+      alert(
+        "Please fill all details"
       );
 
-      alert(`Order placed successfully!\nOrder ID: ${docRef.id}`);
+      return;
 
-      clearCart();
-
-      setName("");
-      setPhone("");
-      setAddress("");
-
-      router.push("/my-orders");
-    } catch (error) {
-      console.error(error);
-      alert("Failed to place order");
-    } finally {
-      setLoading(false);
     }
+
+
+
+
+
+
+    let message =
+`🛒 *Nithesh Cosmetics Order*
+
+👤 Name: ${name}
+
+📱 Phone: ${phone}
+
+📍 Address:
+${address}
+
+📦 Products:
+`;
+
+
+
+
+    cart.forEach((item) => {
+
+      message +=
+`
+${item.name}
+Quantity: ${item.quantity}
+Price: ₹${item.price}
+`;
+
+    });
+
+
+
+
+
+    message +=
+`
+💰 Total Amount: ₹${total}
+`;
+
+
+
+    const whatsappNumber =
+      "9676578296";
+
+
+
+    const url =
+      `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+
+
+
+    window.open(
+      url,
+      "_blank"
+    );
+
+
+
+    clearCart();
+
+
+    router.push("/");
+
   };
 
+
+
+
+
+
   return (
-    <div style={{ padding: 20, maxWidth: 600, margin: "0 auto" }}>
-      <h1>Checkout 🧾</h1>
 
-      <input
-        type="text"
-        placeholder="Full Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        style={{
-          width: "100%",
-          padding: 10,
-          marginBottom: 10,
-        }}
-      />
+    <div className="max-w-5xl mx-auto p-6">
 
-      <input
-        type="text"
-        placeholder="Phone Number"
-        value={phone}
-        onChange={(e) => setPhone(e.target.value)}
-        style={{
-          width: "100%",
-          padding: 10,
-          marginBottom: 10,
-        }}
-      />
 
-      <textarea
-        placeholder="Delivery Address"
-        value={address}
-        onChange={(e) => setAddress(e.target.value)}
-        style={{
-          width: "100%",
-          padding: 10,
-          marginBottom: 20,
-          height: 100,
-        }}
-      />
+      <h1 className="text-4xl font-bold mb-8">
 
-      <h2>Order Summary</h2>
+        Checkout 🛒
 
-      {cart.map((item: any) => (
-        <div
-          key={item.id}
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            marginBottom: 10,
-          }}
-        >
-          <span>
-            {item.name} × {item.qty}
-          </span>
+      </h1>
 
-          <span>₹{item.price * item.qty}</span>
+
+
+
+
+      <div className="grid md:grid-cols-2 gap-8">
+
+
+
+        <div className="space-y-4">
+
+
+          <input
+
+            type="text"
+
+            placeholder="Full Name"
+
+            value={name}
+
+            onChange={(e) =>
+              setName(e.target.value)
+            }
+
+            className="w-full border p-3 rounded-lg"
+
+          />
+
+
+
+
+
+          <input
+
+            type="tel"
+
+            placeholder="Phone Number"
+
+            value={phone}
+
+            onChange={(e) =>
+              setPhone(e.target.value)
+            }
+
+            className="w-full border p-3 rounded-lg"
+
+          />
+
+
+
+
+
+          <textarea
+
+            placeholder="Delivery Address"
+
+            value={address}
+
+            onChange={(e) =>
+              setAddress(e.target.value)
+            }
+
+            className="w-full border p-3 rounded-lg h-32"
+
+          />
+
+
+
         </div>
-      ))}
+        <div className="border rounded-xl p-6">
 
-      <hr />
 
-      <h2>Total: ₹{total}</h2>
+          <h2 className="text-2xl font-bold mb-5">
+            Order Summary
+          </h2>
 
-      <button
-        onClick={placeOrder}
-        disabled={loading}
-        style={{
-          background: "green",
-          color: "white",
-          padding: 12,
-          border: "none",
-          width: "100%",
-          marginTop: 20,
-          cursor: "pointer",
-          borderRadius: 8,
-          fontSize: 16,
-        }}
-      >
-        {loading ? "Placing Order..." : "Place Order (Cash on Delivery)"}
-      </button>
+
+
+
+          {cart.length === 0 ? (
+
+            <p>
+              Your cart is empty
+            </p>
+
+          ) : (
+
+            cart.map((item) => (
+
+              <div
+                key={item.id}
+                className="flex justify-between border-b py-3"
+              >
+
+                <div>
+
+                  <h3 className="font-semibold">
+                    {item.name}
+                  </h3>
+
+                  <p>
+                    Qty: {item.quantity}
+                  </p>
+
+                </div>
+
+
+                <p className="font-bold">
+                  ₹{item.price * item.quantity}
+                </p>
+
+
+              </div>
+
+            ))
+
+          )}
+
+
+
+
+
+          <div className="mt-6 border-t pt-4">
+
+            <h3 className="text-2xl font-bold">
+              Total: ₹{total}
+            </h3>
+
+
+          </div>
+
+
+
+
+
+
+          <button
+
+            onClick={placeOrder}
+
+            className="mt-6 w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-bold"
+
+          >
+
+            Place Order on WhatsApp 📲
+
+          </button>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
     </div>
+
   );
+
+
 }
