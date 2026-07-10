@@ -1,86 +1,102 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
+import { useCart } from "@/app/context/CartContext";
 
 export default function Navbar() {
-  const [open, setOpen] = useState(false);
+
+  const { cart } = useCart();
+
+
+  const cartCount = cart.reduce(
+    (total, item) =>
+      total + item.quantity,
+    0
+  );
+
 
   return (
-    <header className="sticky top-0 z-50 bg-black shadow-lg">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        <div className="flex items-center justify-between h-16">
+    <nav className="bg-black text-white px-6 py-4 flex justify-between items-center">
 
-          {/* Logo */}
-          <Link
-            href="/"
-            className="text-yellow-400 text-xl md:text-2xl font-bold"
-          >
-            Nithesh Cosmetics
-          </Link>
+      {/* Logo */}
 
-          {/* Desktop Menu */}
-          <nav className="hidden md:flex items-center gap-8">
-            <Link href="/" className="hover:text-yellow-400">Home</Link>
-            <Link href="/products" className="hover:text-yellow-400">Products</Link>
-            <Link href="/about" className="hover:text-yellow-400">About</Link>
-            <Link href="/contact" className="hover:text-yellow-400">Contact</Link>
+      <Link
+        href="/"
+        className="text-2xl font-bold text-yellow-400"
+      >
+        Nithesh Cosmetics
+      </Link>
 
-            <Link
-              href="/cart"
-              className="bg-yellow-500 text-black px-4 py-2 rounded-lg font-semibold hover:bg-yellow-400"
+
+
+      {/* Menu */}
+
+      <div className="flex items-center gap-6">
+
+
+        <Link
+          href="/"
+          className="hover:text-yellow-400"
+        >
+          Home
+        </Link>
+
+
+
+        <Link
+          href="/products"
+          className="hover:text-yellow-400"
+        >
+          Products
+        </Link>
+
+
+
+        {/* Cart */}
+
+        <Link
+          href="/cart"
+          className="relative hover:text-yellow-400"
+        >
+
+          🛒 Cart
+
+
+          {cartCount > 0 && (
+
+            <span
+              className="
+              absolute
+              -top-3
+              -right-3
+              bg-red-600
+              text-white
+              text-xs
+              w-6
+              h-6
+              rounded-full
+              flex
+              items-center
+              justify-center
+              "
             >
-              🛒 Cart
-            </Link>
-          </nav>
 
-          {/* Mobile Button */}
-          <button
-            onClick={() => setOpen(!open)}
-            className="md:hidden text-white text-3xl"
-          >
-            {open ? "✕" : "☰"}
-          </button>
+              {cartCount}
 
-        </div>
+            </span>
 
-        {/* Mobile Menu */}
-        {open && (
-          <div className="md:hidden pb-4">
+          )}
 
-            <div className="flex flex-col gap-3">
 
-              <Link href="/" onClick={() => setOpen(false)}>
-                Home
-              </Link>
+        </Link>
 
-              <Link href="/products" onClick={() => setOpen(false)}>
-                Products
-              </Link>
 
-              <Link href="/about" onClick={() => setOpen(false)}>
-                About
-              </Link>
-
-              <Link href="/contact" onClick={() => setOpen(false)}>
-                Contact
-              </Link>
-
-              <Link
-                href="/cart"
-                onClick={() => setOpen(false)}
-                className="bg-yellow-500 text-center text-black py-2 rounded-lg font-semibold"
-              >
-                🛒 Cart
-              </Link>
-
-            </div>
-
-          </div>
-        )}
 
       </div>
-    </header>
+
+
+    </nav>
+
   );
 }

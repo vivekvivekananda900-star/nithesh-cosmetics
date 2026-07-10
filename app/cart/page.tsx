@@ -1,71 +1,168 @@
 "use client";
 
 import { useCart } from "@/app/context/CartContext";
-import { useRouter } from "next/navigation";
+
 
 export default function CartPage() {
-  const { cart, addToCart, decreaseQty, clearCart } = useCart();
-  const router = useRouter();
 
-  // 💰 total price
+
+  const {
+    cart,
+    increaseQuantity,
+    decreaseQuantity,
+    removeFromCart,
+  } = useCart();
+
+
+
   const total = cart.reduce(
-    (sum: number, item: any) => sum + item.price * item.qty,
+    (sum, item) =>
+      sum + item.price * item.quantity,
     0
   );
 
+
+
   return (
-    <div style={{ padding: 20 }}>
-      <h1>🛒 My Cart</h1>
+
+    <div className="max-w-5xl mx-auto p-6">
+
+
+      <h1 className="text-4xl font-bold mb-8">
+        My Cart 🛒
+      </h1>
+
+
 
       {cart.length === 0 ? (
-        <p>Your cart is empty</p>
+
+        <p className="text-xl">
+          Your cart is empty
+        </p>
+
+
       ) : (
-        cart.map((item: any) => (
+
+
+        <>
+
+        {cart.map((item) => (
+
           <div
             key={item.id}
-            style={{
-              border: "1px solid gray",
-              margin: "10px 0",
-              padding: 10,
-            }}
+            className="border rounded-xl p-5 mb-5 flex justify-between items-center"
           >
-            <img src={item.image} width={100} />
 
-            <h3>{item.name}</h3>
-            <p>₹{item.price}</p>
 
-            {/* Quantity controls */}
-            <div style={{ display: "flex", gap: 10 }}>
-              <button onClick={() => decreaseQty(item.id)}>−</button>
-              <span>{item.qty}</span>
-              <button onClick={() => addToCart(item)}>+</button>
+            <div className="flex gap-5 items-center">
+
+
+              <img
+                src={
+                  item.image ||
+                  "/no-image.png"
+                }
+                alt={item.name}
+                className="w-24 h-24 object-contain border rounded"
+              />
+
+
+              <div>
+
+                <h2 className="text-xl font-bold">
+                  {item.name}
+                </h2>
+
+
+                <p className="text-green-600 font-bold">
+                  ₹{item.price}
+                </p>
+
+
+                <button
+                  onClick={() =>
+                    removeFromCart(item.id)
+                  }
+                  className="text-red-500 mt-2"
+                >
+                  Remove
+                </button>
+
+
+              </div>
+
+
             </div>
+
+
+
+
+            <div className="flex items-center gap-4">
+
+
+              <button
+                onClick={() =>
+                  decreaseQuantity(item.id)
+                }
+                className="bg-red-500 text-white px-4 py-2 rounded"
+              >
+                -
+              </button>
+
+
+
+              <span className="text-xl font-bold">
+                {item.quantity}
+              </span>
+
+
+
+              <button
+                onClick={() =>
+                  increaseQuantity(item.id)
+                }
+                className="bg-green-600 text-white px-4 py-2 rounded"
+              >
+                +
+              </button>
+
+
+
+            </div>
+
+
           </div>
-        ))
-      )}
 
-      {/* Bottom section */}
-      {cart.length > 0 && (
-        <>
-          <h2>Total: ₹{total}</h2>
 
-          <div style={{ display: "flex", gap: 10 }}>
-            <button onClick={clearCart}>Clear Cart</button>
+        ))}
 
-            {/* 🟢 CHECKOUT BUTTON */}
-            <button
-              onClick={() => router.push("/checkout")}
-              style={{
-                background: "green",
-                color: "white",
-                padding: 10,
-              }}
-            >
-              Checkout
-            </button>
-          </div>
+
+
+        <div className="mt-10">
+
+          <h2 className="text-3xl font-bold">
+            Total: ₹{total}
+          </h2>
+
+
+          <button
+            className="mt-5 bg-orange-500 text-white px-8 py-3 rounded-lg"
+          >
+            Proceed to Checkout
+          </button>
+
+
+        </div>
+
+
         </>
+
+
       )}
+
+
     </div>
+
   );
+
 }

@@ -1,102 +1,197 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { doc, getDoc } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/app/lib/firebase";
 import { useCart } from "@/app/context/CartContext";
+
 
 interface Product {
   id: string;
   name: string;
   price: number;
-  category: string;
+  category?: string;
   image?: string;
   description?: string;
 }
 
-export default function ProductDetailsPage() {
-  const { id } = useParams();
-  const router = useRouter();
-  const { addToCart } = useCart();
 
-  const [product, setProduct] = useState<Product | null>(null);
+export default function FeaturedProducts() {
+
+
+  const [products, setProducts] =
+    useState<Product[]>([]);
+
+
+  const { addToCart } =
+    useCart();
+
+
+
 
   useEffect(() => {
-    const fetchProduct = async () => {
-      const docRef = doc(db, "products", id as string);
-      const docSnap = await getDoc(docRef);
 
-      if (docSnap.exists()) {
-        setProduct({
-          id: docSnap.id,
-          ...(docSnap.data() as Omit<Product, "id">),
-        });
-      }
-    };
 
-    fetchProduct();
-  }, [id]);
+    const fetchProducts =
+      async () => {
 
-  if (!product) {
-    return (
-      <div className="p-10 text-center text-xl">
-        Loading...
-      </div>
-    );
-  }
+
+        const snapshot =
+          await getDocs(
+            collection(
+              db,
+              "products"
+            )
+          );
+
+
+
+        const list =
+          snapshot.docs.map(
+            (doc) => ({
+
+              id: doc.id,
+
+              ...(doc.data() as Omit<
+                Product,
+                "id"
+              >),
+
+            })
+          );
+
+
+
+        setProducts(list);
+
+
+      };
+
+
+
+    fetchProducts();
+
+
+  }, []);
+
+
+
+
+
+
 
   return (
-    <div className="max-w-5xl mx-auto p-6 grid md:grid-cols-2 gap-8">
 
-      <div>
-        <img
-          src={product.image || "/no-image.png"}
-          alt={product.name}
-          className="w-full h-[450px] object-contain rounded-xl border"
-        />
-      </div>
+    <section className="bg-white py-16">
 
-      <div>
-        <h1 className="text-4xl font-bold">
-          {product.name}
-        </h1>
+      <div className="max-w-7xl mx-auto px-4">
 
-        <p className="text-gray-500 mt-3">
-          Category: {product.category}
-        </p>
 
-        <h2 className="text-3xl text-green-600 font-bold mt-5">
-          ₹{product.price}
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-10">
+
+          Featured Products
+
         </h2>
 
-        <p className="mt-6 text-gray-700">
-          {product.description ||
-            "No description available for this product."}
-        </p>
 
-        <div className="flex gap-4 mt-8">
 
-          <button
-            onClick={() => addToCart(product)}
-            className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg"
-          >
-            Add to Cart 🛒
-          </button>
 
-          <button
-            onClick={() => {
-              addToCart(product);
-              router.push("/checkout");
-            }}
-            className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg"
-          >
-            Buy Now ⚡
-          </button>
+
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+
+
+
+          {products.map((product) => (
+
+
+            <div
+
+              key={product.id}
+
+              className="bg-white rounded-xl shadow-md hover:shadow-xl transition duration-300 overflow-hidden"
+
+            >
+
+
+
+              <img
+
+                src={
+                  product.image ||
+                  "/no-image.png"
+                }
+
+                alt={product.name}
+
+                className="w-full aspect-square object-cover"
+
+              />
+
+
+
+
+
+              <div className="p-4">
+
+
+
+                <h3 className="font-semibold text-sm md:text-lg line-clamp-2">
+
+                  {product.name}
+
+                </h3>
+
+
+
+
+
+                <p className="text-yellow-600 font-bold mt-2 text-lg">
+
+                  ₹{product.price}
+
+                </p>
+
+
+
+
+
+
+
+                <button
+
+                  onClick={() =>
+                    addToCart(product)
+                  }
+
+                  className="mt-4 w-full bg-black text-white py-2 rounded-lg hover:bg-yellow-500 hover:text-black transition"
+
+                >
+
+                  Add to Cart 🛒
+
+                </button>
+
+
+
+
+              </div>
+
+
+            </div>
+
+
+          ))}
+
+
 
         </div>
+
+
       </div>
 
-    </div>
+
+    </section>
+
   );
+
 }
