@@ -1,6 +1,15 @@
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import { CartProvider } from "@/app/context/CartContext";
-import Script from "next/script";
+
+export const metadata: Metadata = {
+  title: "Nithesh Cosmetics",
+  description: "Barber & Cosmetics Products Store",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
 
 export default function RootLayout({
   children,
@@ -9,12 +18,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
-        <CartProvider>{children}</CartProvider>
-
-        {/* Razorpay Checkout Script */}
-        <Script src="https://checkout.razorpay.com/v1/checkout.js" />
-      </body>
+      <body>{children}</body>
     </html>
   );
 }
