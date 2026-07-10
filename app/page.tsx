@@ -9,22 +9,41 @@ export default function Home() {
       <main className="min-h-screen bg-gray-100">
 
         {/* Hero Section */}
-        <section className="bg-gradient-to-r from-black to-gray-900 text-white py-16 sm:py-20 md:py-24">
+        <section className="relative bg-gradient-to-r from-black via-gray-900 to-black text-white py-20 md:py-28 overflow-hidden">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
 
-            <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-yellow-400">
+            <span className="inline-block bg-yellow-500 text-black px-4 py-2 rounded-full text-sm font-semibold mb-6">
+              Premium Barber & Cosmetics Store
+            </span>
+
+            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-extrabold text-yellow-400">
               Nithesh Cosmetics
             </h1>
 
-            <p className="mt-6 text-base sm:text-lg md:text-xl text-gray-300 max-w-3xl mx-auto">
-              Your Trusted Partner for Barber & Cosmetics Products
+            <p className="mt-6 text-lg md:text-xl text-gray-300 max-w-3xl mx-auto">
+              Premium shaving machines, barber tools, facial products,
+              cosmetics, grooming accessories and much more at affordable prices.
             </p>
 
-            <a href="#products">
-              <button className="mt-8 bg-yellow-500 text-black px-6 sm:px-8 py-3 rounded-lg font-bold hover:bg-yellow-400 transition duration-300">
-                Shop Now
-              </button>
-            </a>
+            <div className="mt-10 flex flex-col sm:flex-row justify-center gap-4">
+
+              <a href="#products">
+                <button className="bg-yellow-500 hover:bg-yellow-400 text-black px-8 py-4 rounded-xl font-bold transition w-full sm:w-auto">
+                  🛍 Shop Now
+                </button>
+              </a>
+
+              <a
+                href="https://wa.me/919676578296"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <button className="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-xl font-bold transition w-full sm:w-auto">
+                  WhatsApp Us
+                </button>
+              </a>
+
+            </div>
 
           </div>
         </section>
@@ -35,73 +54,77 @@ export default function Home() {
         </div>
 
         {/* Categories */}
-        <section className="py-12 sm:py-16 px-4 sm:px-6 bg-gray-100">
+        <section className="py-16 bg-gray-100">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-          <h2 className="text-3xl sm:text-4xl font-bold text-center mb-10">
-            Our Categories
-          </h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+              Shop by Category
+            </h2>
 
-          <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
 
-            <div className="bg-white p-6 rounded-xl shadow-lg hover:scale-105 transition">
-              <h3 className="text-xl font-bold">✂️ Shaving Machines</h3>
-            </div>
+              <div className="bg-white rounded-2xl shadow-lg p-6 text-center hover:shadow-2xl hover:-translate-y-2 transition">
+                <div className="text-5xl mb-4">✂️</div>
+                <h3 className="font-bold">Shaving Machines</h3>
+              </div>
 
-            <div className="bg-white p-6 rounded-xl shadow-lg hover:scale-105 transition">
-              <h3 className="text-xl font-bold">💈 Barber Items</h3>
-            </div>
+              <div className="bg-white rounded-2xl shadow-lg p-6 text-center hover:shadow-2xl hover:-translate-y-2 transition">
+                <div className="text-5xl mb-4">💈</div>
+                <h3 className="font-bold">Barber Items</h3>
+              </div>
 
-            <div className="bg-white p-6 rounded-xl shadow-lg hover:scale-105 transition">
-              <h3 className="text-xl font-bold">🧴 Facial Products</h3>
-            </div>
+              <div className="bg-white rounded-2xl shadow-lg p-6 text-center hover:shadow-2xl hover:-translate-y-2 transition">
+                <div className="text-5xl mb-4">🧴</div>
+                <h3 className="font-bold">Facial Products</h3>
+              </div>
 
-            <div className="bg-white p-6 rounded-xl shadow-lg hover:scale-105 transition">
-              <h3 className="text-xl font-bold">💄 Cosmetics</h3>
-            </div>
+              <div className="bg-white rounded-2xl shadow-lg p-6 text-center hover:shadow-2xl hover:-translate-y-2 transition">
+                <div className="text-5xl mb-4">💄</div>
+                <h3 className="font-bold">Cosmetics</h3>
+              </div>
 
-            <div className="bg-white p-6 rounded-xl shadow-lg hover:scale-105 transition">
-              <h3 className="text-xl font-bold">🪮 Grooming Accessories</h3>
-            </div>
+              <div className="bg-white rounded-2xl shadow-lg p-6 text-center hover:shadow-2xl hover:-translate-y-2 transition">
+                <div className="text-5xl mb-4">🪮</div>
+                <h3 className="font-bold">Accessories</h3>
+              </div>
 
-            <div className="bg-white p-6 rounded-xl shadow-lg hover:scale-105 transition">
-              <h3 className="text-xl font-bold">➕ More Products Coming Soon</h3>
+              <div className="bg-white rounded-2xl shadow-lg p-6 text-center hover:shadow-2xl hover:-translate-y-2 transition">
+                <div className="text-5xl mb-4">➕</div>
+                <h3 className="font-bold">More</h3>
+              </div>
+
             </div>
 
           </div>
-
         </section>
-
         {/* About */}
-        <section className="bg-white py-16 sm:py-20 px-4 sm:px-6">
+        <section className="bg-white py-20">
+          <div className="max-w-6xl mx-auto px-4 text-center">
 
-          <div className="max-w-5xl mx-auto text-center">
-
-            <h2 className="text-3xl sm:text-4xl font-bold mb-6">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6">
               About Nithesh Cosmetics
             </h2>
 
-            <p className="text-base sm:text-lg text-gray-600 leading-8">
-              Nithesh Cosmetics is your trusted destination for barber tools,
-              shaving machines, facial products, cosmetics, grooming
-              accessories, and many other premium-quality products at affordable
-              prices. We are committed to providing genuine products and
-              excellent customer service.
+            <p className="text-gray-600 text-lg leading-8 max-w-4xl mx-auto">
+              Nithesh Cosmetics is your trusted destination for premium barber
+              tools, shaving machines, facial products, cosmetics, grooming
+              accessories, and many more quality products at affordable prices.
+              We are committed to providing genuine products with excellent
+              customer service.
             </p>
 
           </div>
-
         </section>
 
         {/* Contact */}
-        <section className="bg-black text-white py-16 sm:py-20 px-4">
+        <section className="bg-black text-white py-20">
+          <div className="max-w-6xl mx-auto px-4 text-center">
 
-          <div className="max-w-5xl mx-auto text-center">
-
-            <h2 className="text-3xl sm:text-4xl font-bold text-yellow-400">
+            <h2 className="text-3xl md:text-4xl font-bold text-yellow-400 mb-6">
               Contact Us
             </h2>
 
-            <p className="mt-8 text-base sm:text-lg">
+            <p className="text-lg text-gray-300 leading-8">
               📍 Near VKR Hospital
               <br />
               Naganool Road
@@ -116,13 +139,13 @@ export default function Home() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <button className="w-full sm:w-auto bg-green-500 px-8 py-3 rounded-lg font-bold hover:bg-green-600 transition">
+                <button className="bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-xl font-bold transition w-full sm:w-auto">
                   WhatsApp
                 </button>
               </a>
 
               <a href="tel:+919676578296">
-                <button className="w-full sm:w-auto bg-yellow-500 text-black px-8 py-3 rounded-lg font-bold hover:bg-yellow-400 transition">
+                <button className="bg-yellow-500 hover:bg-yellow-400 text-black px-8 py-3 rounded-xl font-bold transition w-full sm:w-auto">
                   Call Now
                 </button>
               </a>
@@ -130,14 +153,25 @@ export default function Home() {
             </div>
 
           </div>
-
         </section>
 
         {/* Footer */}
-        <footer className="bg-gray-900 text-white py-6 text-center px-4">
-          <p className="text-sm sm:text-base">
-            © 2026 Nithesh Cosmetics. All Rights Reserved.
-          </p>
+        <footer className="bg-gray-900 text-gray-300 py-8">
+          <div className="max-w-7xl mx-auto px-4 text-center">
+
+            <h3 className="text-xl font-bold text-yellow-400">
+              Nithesh Cosmetics
+            </h3>
+
+            <p className="mt-2">
+              Premium Barber & Cosmetics Products
+            </p>
+
+            <p className="mt-6 text-sm">
+              © 2026 Nithesh Cosmetics. All Rights Reserved.
+            </p>
+
+          </div>
         </footer>
 
       </main>

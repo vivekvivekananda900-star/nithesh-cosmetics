@@ -20,7 +20,7 @@ export default function FeaturedProducts() {
     const fetchProducts = async () => {
       const snapshot = await getDocs(collection(db, "products"));
 
-      const list = snapshot.docs.slice(0, 3).map((doc) => ({
+      const list = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...(doc.data() as Omit<Product, "id">),
       }));
@@ -32,41 +32,47 @@ export default function FeaturedProducts() {
   }, []);
 
   return (
-    <section className="py-16 bg-white">
-      <h2 className="text-4xl font-bold text-center mb-10">
-        Featured Products
-      </h2>
+    <section className="bg-white py-16">
+      <div className="max-w-7xl mx-auto px-4">
 
-      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 px-6">
-        {products.map((product) => (
-          <div
-            key={product.id}
-            className="bg-gray-100 rounded-xl shadow-lg overflow-hidden hover:scale-105 transition"
-          >
-            {product.image && (
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-10">
+          Featured Products
+        </h2>
+
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+
+          {products.map((product) => (
+            <div
+              key={product.id}
+              className="bg-white rounded-xl shadow-md hover:shadow-xl transition duration-300 overflow-hidden"
+            >
               <img
-                src={product.image}
+                src={product.image || "/no-image.png"}
                 alt={product.name}
-                className="w-full h-64 object-cover"
+                className="w-full aspect-square object-cover"
               />
-            )}
 
-            <div className="p-5">
-              <h3 className="text-xl font-bold">{product.name}</h3>
+              <div className="p-4">
+                <h3 className="font-semibold text-sm md:text-lg line-clamp-2">
+                  {product.name}
+                </h3>
 
-              <p className="text-yellow-600 font-bold mt-2">
-                ₹{product.price}
-              </p>
+                <p className="text-yellow-600 font-bold mt-2 text-lg">
+                  ₹{product.price}
+                </p>
 
-              <button
-                onClick={() => addToCart(product)}
-                className="mt-4 w-full bg-black text-white py-3 rounded-lg hover:bg-yellow-500 hover:text-black"
-              >
-                Add to Cart 🛒
-              </button>
+                <button
+                  onClick={() => addToCart(product)}
+                  className="mt-4 w-full bg-black text-white py-2 rounded-lg hover:bg-yellow-500 hover:text-black transition"
+                >
+                  Add to Cart 🛒
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+
+        </div>
+
       </div>
     </section>
   );
