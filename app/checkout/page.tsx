@@ -4,6 +4,16 @@ import { useState } from "react";
 import { useCart } from "@/app/context/CartContext";
 import { useRouter } from "next/navigation";
 
+import {
+  collection,
+  addDoc,
+  Timestamp,
+} from "firebase/firestore";
+
+import { db } from "@/app/lib/firebase";
+
+import { generateInvoice } from "@/app/utils/generateInvoice";
+
 
 export default function CheckoutPage() {
 
@@ -15,7 +25,6 @@ export default function CheckoutPage() {
 
 
   const router = useRouter();
-
 
 
   const [name, setName] =
@@ -30,13 +39,12 @@ export default function CheckoutPage() {
 
 
 
-
   const total =
     cart.reduce(
       (sum, item) =>
         sum +
         item.price *
-          item.quantity,
+        item.quantity,
       0
     );
 
@@ -44,8 +52,7 @@ export default function CheckoutPage() {
 
 
 
-
-  const placeOrder = () => {
+  const placeOrder = async () => {
 
 
     if (
@@ -64,15 +71,95 @@ export default function CheckoutPage() {
 
 
 
+    if (cart.length === 0) {
+
+      alert(
+        "Your cart is empty"
+      );
+
+      return;
+
+    }
 
 
 
-    let message =
+
+    try {
+
+
+      const orderRef =
+        await addDoc(
+          collection(
+            db,
+            "orders"
+          ),
+          {
+
+            customerName:name,
+
+            phone:phone,
+
+            address:address,
+
+            products:cart,
+
+            total:total,
+
+            status:"Pending",
+
+            createdAt:
+              Timestamp.now(),
+
+          }
+        );
+
+
+
+
+      // Generate Invoice
+
+      try {
+
+        generateInvoice(
+
+          orderRef.id,
+
+          {
+            name,
+            phone,
+            address,
+          },
+
+          cart,
+
+          total
+
+        );
+
+      } catch(error) {
+
+        console.log(
+          "Invoice Error",
+          error
+        );
+
+      }
+
+
+
+
+
+      let message =
 `🛒 *Nithesh Cosmetics Order*
 
-👤 Name: ${name}
+🧾 Order ID:
+${orderRef.id}
 
-📱 Phone: ${phone}
+👤 Name:
+${name}
+
+📱 Phone:
+${phone}
 
 📍 Address:
 ${address}
@@ -83,49 +170,86 @@ ${address}
 
 
 
-    cart.forEach((item) => {
+
+      cart.forEach((item)=>{
+
+
+        message +=
+`
+${item.name}
+
+Quantity:
+${item.quantity}
+
+Price:
+₹${item.price}
+
+`;
+
+      });
+
+
+
+
 
       message +=
 `
-${item.name}
-Quantity: ${item.quantity}
-Price: ₹${item.price}
-`;
+💰 Total:
+₹${total}
 
-    });
+Thank you 🙏`;
 
 
 
 
 
-    message +=
-`
-💰 Total Amount: ₹${total}
-`;
+      const whatsappNumber =
+        "919676578296";
 
 
 
-    const whatsappNumber =
-      "9676578296";
+
+
+      const whatsappURL =
+`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
 
 
 
-    const url =
-      `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+
+
+      window.open(
+        whatsappURL,
+        "_blank"
+      );
 
 
 
-    window.open(
-      url,
-      "_blank"
-    );
+
+
+      clearCart();
 
 
 
-    clearCart();
+      router.push(
+        `/order-success?orderId=${orderRef.id}`
+      );
 
 
-    router.push("/");
+
+
+    } catch(error) {
+
+
+      console.log(error);
+
+
+      alert(
+        "Order failed. Try again."
+      );
+
+
+    }
+
 
   };
 
@@ -136,13 +260,11 @@ Price: ₹${item.price}
 
   return (
 
-    <div className="max-w-5xl mx-auto p-6">
+    <div className="max-w-6xl mx-auto p-6">
 
 
       <h1 className="text-4xl font-bold mb-8">
-
         Checkout 🛒
-
       </h1>
 
 
@@ -152,8 +274,7 @@ Price: ₹${item.price}
       <div className="grid md:grid-cols-2 gap-8">
 
 
-
-        <div className="space-y-4">
+        <div className="space-y-5">
 
 
           <input
@@ -164,15 +285,13 @@ Price: ₹${item.price}
 
             value={name}
 
-            onChange={(e) =>
+            onChange={(e)=>
               setName(e.target.value)
             }
 
             className="w-full border p-3 rounded-lg"
 
           />
-
-
 
 
 
@@ -184,7 +303,7 @@ Price: ₹${item.price}
 
             value={phone}
 
-            onChange={(e) =>
+            onChange={(e)=>
               setPhone(e.target.value)
             }
 
@@ -194,15 +313,13 @@ Price: ₹${item.price}
 
 
 
-
-
           <textarea
 
             placeholder="Delivery Address"
 
             value={address}
 
-            onChange={(e) =>
+            onChange={(e)=>
               setAddress(e.target.value)
             }
 
@@ -211,8 +328,13 @@ Price: ₹${item.price}
           />
 
 
-
         </div>
+
+
+
+
+
+
         <div className="border rounded-xl p-6">
 
 
@@ -223,57 +345,62 @@ Price: ₹${item.price}
 
 
 
-          {cart.length === 0 ? (
 
-            <p>
-              Your cart is empty
-            </p>
-
-          ) : (
-
-            cart.map((item) => (
-
-              <div
-                key={item.id}
-                className="flex justify-between border-b py-3"
-              >
-
-                <div>
-
-                  <h3 className="font-semibold">
-                    {item.name}
-                  </h3>
-
-                  <p>
-                    Qty: {item.quantity}
-                  </p>
-
-                </div>
+          {cart.map((item)=>(
 
 
-                <p className="font-bold">
-                  ₹{item.price * item.quantity}
+            <div
+
+              key={item.id}
+
+              className="flex justify-between border-b py-3"
+
+            >
+
+
+              <div>
+
+                <h3 className="font-semibold">
+                  {item.name}
+                </h3>
+
+
+                <p>
+                  Qty: {item.quantity}
                 </p>
 
 
               </div>
 
-            ))
-
-          )}
 
 
 
+              <p className="font-bold">
+
+                ₹
+                {item.price *
+                item.quantity}
+
+              </p>
 
 
-          <div className="mt-6 border-t pt-4">
 
-            <h3 className="text-2xl font-bold">
-              Total: ₹{total}
-            </h3>
+            </div>
 
 
-          </div>
+          ))}
+
+
+
+
+
+
+          <h2 className="text-3xl font-bold mt-6">
+
+            Total:
+            ₹{total}
+
+          </h2>
 
 
 
@@ -288,14 +415,14 @@ Price: ₹${item.price}
 
           >
 
-            Place Order on WhatsApp 📲
+            Place Order 📲
 
           </button>
 
 
 
-        </div>
 
+        </div>
 
 
       </div>
