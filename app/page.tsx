@@ -1,3 +1,4 @@
+import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import FeaturedProducts from "@/components/FeaturedProducts";
 
@@ -20,25 +21,25 @@ export default function Home() {
               Nithesh Cosmetics
             </h1>
 
-            <p className="mt-6 text-lg md:text-xl text-gray-300 max-w-3xl mx-auto">
+            <p className="mt-6 max-w-3xl mx-auto text-lg md:text-xl text-gray-300">
               Premium shaving machines, barber tools, facial products,
               cosmetics, grooming accessories and much more at affordable prices.
             </p>
 
             <div className="mt-10 flex flex-col sm:flex-row justify-center gap-4">
 
-              <a href="#products">
-                <button className="bg-yellow-500 hover:bg-yellow-400 text-black px-8 py-4 rounded-xl font-bold transition w-full sm:w-auto">
+              <Link href="/products">
+                <button className="bg-yellow-500 hover:bg-yellow-400 text-black px-8 py-4 rounded-xl font-bold transition shadow-lg w-full sm:w-auto">
                   🛍 Shop Now
                 </button>
-              </a>
+              </Link>
 
               <a
                 href="https://wa.me/919676578296"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <button className="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-xl font-bold transition w-full sm:w-auto">
+                <button className="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-xl font-bold transition shadow-lg w-full sm:w-auto">
                   WhatsApp Us
                 </button>
               </a>
@@ -130,6 +131,8 @@ export default function Home() {
               Naganool Road
               <br />
               Nagarkurnool - 509209
+              <br />
+              📞 +91 9676578296
             </p>
 
             <div className="mt-10 flex flex-col sm:flex-row justify-center gap-4">
@@ -156,10 +159,10 @@ export default function Home() {
         </section>
 
         {/* Footer */}
-        <footer className="bg-gray-900 text-gray-300 py-8">
+        <footer className="bg-gray-900 text-gray-300 py-10">
           <div className="max-w-7xl mx-auto px-4 text-center">
 
-            <h3 className="text-xl font-bold text-yellow-400">
+            <h3 className="text-2xl font-bold text-yellow-400">
               Nithesh Cosmetics
             </h3>
 
@@ -167,8 +170,12 @@ export default function Home() {
               Premium Barber & Cosmetics Products
             </p>
 
+            <p className="mt-4">
+              Thank you for shopping with us ❤️
+            </p>
+
             <p className="mt-6 text-sm">
-              © 2026 Nithesh Cosmetics. All Rights Reserved.
+              © 2026 Nithesh Cosmetics. vivek All Rights Reserved.
             </p>
 
           </div>
