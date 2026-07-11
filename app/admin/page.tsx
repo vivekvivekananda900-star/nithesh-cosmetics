@@ -1,133 +1,46 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
-import {
-  collection,
-  getDocs,
-  deleteDoc,
-  doc,
-} from "firebase/firestore";
-import { db } from "@/app/lib/firebase";
 
-interface Product {
-  id: string;
-  name: string;
-  price: number;
-  mrp?: number;
-  discount?: number;
-  category: string;
-  description?: string;
-  image?: string;
-}
-
-export default function AdminProducts() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [search, setSearch] = useState("");
-
-  const fetchProducts = async () => {
-    const snapshot = await getDocs(collection(db, "products"));
-
-    const list: Product[] = snapshot.docs.map((docSnap) => {
-      const data = docSnap.data();
-
-      return {
-        id: docSnap.id,
-        name: data.name,
-        price: data.price,
-        mrp: data.mrp,
-        discount: data.discount,
-        category: data.category,
-        description: data.description,
-        image: data.image,
-      };
-    });
-
-    setProducts(list);
-  };
-
-  useEffect(() => {
-    fetchProducts();
-  }, []);
-
-  const filteredProducts = products.filter(
-    (product) =>
-      product.name
-        .toLowerCase()
-        .includes(search.toLowerCase()) ||
-      product.category
-        .toLowerCase()
-        .includes(search.toLowerCase())
-  );
-
-  const deleteProduct = async (id: string) => {
-    const ok = confirm(
-      "Delete this product?"
-    );
-
-    if (!ok) return;
-
-    await deleteDoc(doc(db, "products", id));
-
-    alert("Product Deleted");
-
-    fetchProducts();
-  };
-
+export default function AdminDashboard() {
   return (
     <main className="min-h-screen bg-gray-100 p-8">
+      <h1 className="text-4xl font-bold text-center mb-10">
+        Admin Dashboard
+      </h1>
 
-      <div
-      {filteredProducts.map((product) => (
-              <tr
-                key={product.id}
-                className="border-b hover:bg-gray-50"
-              >
-                <td className="p-4">
-                  {product.image ? (
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-16 h-16 rounded-lg object-cover"
-                    />
-                  ) : (
-                    "No Image"
-                  )}
-                </td>
+      <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-6">
 
-                <td className="p-4 font-semibold">
-                  {product.name}
-                </td>
+        <Link
+          href="/admin/add-product"
+          className="bg-white shadow-lg rounded-xl p-8 text-center hover:shadow-xl"
+        >
+          <h2 className="text-2xl font-bold">➕ Add Product</h2>
+          <p className="mt-3 text-gray-600">
+            Add new products
+          </p>
+        </Link>
 
-                <td className="p-4">
-                  {product.category}
-                </td>
+        <Link
+          href="/admin/products"
+          className="bg-white shadow-lg rounded-xl p-8 text-center hover:shadow-xl"
+        >
+          <h2 className="text-2xl font-bold">📦 Manage Products</h2>
+          <p className="mt-3 text-gray-600">
+            Edit & Delete Products
+          </p>
+        </Link>
 
-                <td className="p-4 font-bold text-green-600">
-                  ₹{product.price}
-                </td>
+        <Link
+          href="/contact"
+          className="bg-white shadow-lg rounded-xl p-8 text-center hover:shadow-xl"
+        >
+          <h2 className="text-2xl font-bold">📞 Contact</h2>
+          <p className="mt-3 text-gray-600">
+            Business details
+          </p>
+        </Link>
 
-                <td className="p-4 flex gap-3">
-
-                  <Link
-                    href={`/admin/edit-product/${product.id}`}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-                  >
-                    ✏️ Edit
-                  </Link>
-
-                  <button
-                    onClick={() => deleteProduct(product.id)}
-                    className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
-                  >
-                    🗑 Delete
-                  </button>
-
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
       </div>
     </main>
   );
