@@ -61,15 +61,13 @@ export default function AdminProducts() {
   );
 
   const deleteProduct = async (id: string) => {
-    const ok = confirm(
-      "Delete this product?"
-    );
+    const ok = confirm("Delete this product?");
 
     if (!ok) return;
 
     await deleteDoc(doc(db, "products", id));
 
-    alert("Product Deleted");
+    alert("✅ Product Deleted Successfully");
 
     fetchProducts();
   };
@@ -77,8 +75,53 @@ export default function AdminProducts() {
   return (
     <main className="min-h-screen bg-gray-100 p-8">
 
-      <div
-      {filteredProducts.map((product) => (
+      <div className="flex justify-between items-center mb-8">
+
+        <h1 className="text-4xl font-bold">
+          Manage Products
+        </h1>
+
+        <Link
+          href="/admin/add-product"
+          className="bg-green-600 text-white px-5 py-3 rounded-lg hover:bg-green-700"
+        >
+          ➕ Add Product
+        </Link>
+
+      </div>
+
+      <input
+        type="text"
+        placeholder="🔍 Search Product..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="w-full border p-3 rounded-lg mb-6"
+      />
+
+      <div className="overflow-x-auto">
+
+        <table className="w-full bg-white rounded-xl shadow-lg">
+
+          <thead className="bg-black text-white">
+
+            <tr>
+
+              <th className="p-4">Image</th>
+
+              <th className="p-4">Name</th>
+
+              <th className="p-4">Category</th>
+
+              <th className="p-4">Price</th>
+
+              <th className="p-4">Actions</th>
+
+            </tr>
+
+          </thead>
+
+          <tbody>
+            {filteredProducts.map((product) => (
               <tr
                 key={product.id}
                 className="border-b hover:bg-gray-50"
@@ -88,10 +131,12 @@ export default function AdminProducts() {
                     <img
                       src={product.image}
                       alt={product.name}
-                      className="w-16 h-16 rounded-lg object-cover"
+                      className="w-16 h-16 object-cover rounded-lg"
                     />
                   ) : (
-                    "No Image"
+                    <span className="text-gray-400">
+                      No Image
+                    </span>
                   )}
                 </td>
 
@@ -103,7 +148,7 @@ export default function AdminProducts() {
                   {product.category}
                 </td>
 
-                <td className="p-4 font-bold text-green-600">
+                <td className="p-4">
                   ₹{product.price}
                 </td>
 
@@ -124,11 +169,21 @@ export default function AdminProducts() {
                   </button>
 
                 </td>
+
               </tr>
             ))}
-          </tbody>
+            </tbody>
+
         </table>
+
       </div>
+
+      {filteredProducts.length === 0 && (
+        <div className="text-center mt-10 text-gray-500 text-lg">
+          No products found.
+        </div>
+      )}
+
     </main>
   );
 }
