@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { collection, getDocs } from "firebase/firestore";
-import { db } from "../lib/firebase";
+import { db } from "@/app/lib/firebase";
 import { useCart } from "@/app/context/CartContext";
 
 interface Product {
@@ -114,77 +114,73 @@ export default function ProductsPage() {
               className="bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition"
             >
 
-              <Link href={`/products/${product.id}`}>
+              {product.image && (
+                <img
+                  src={product.image}
+                  alt={product.name}
+                  className="w-full h-52 object-cover rounded-lg"
+                />
+              )}
 
-                {product.image && (
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="w-full h-52 object-cover rounded-lg"
-                  />
-                )}
+              <h2 className="text-2xl font-bold mt-4">
+                {product.name}
+              </h2>
 
-                <h2 className="text-2xl font-bold mt-4">
-                  {product.name}
-                </h2>
+              <p className="text-gray-600">
+                {product.category}
+              </p>
 
-                <p className="text-gray-600">
-                  {product.category}
+              {product.description && (
+                <p className="text-sm text-gray-500 mt-2">
+                  {product.description}
                 </p>
-
-                {product.description && (
-                  <p className="text-sm text-gray-500 mt-2">
-                    {product.description}
-                  </p>
-                )}
-
-              </Link>
+              )}
               {product.mrp && (
-                  <p className="text-gray-500 line-through mt-2">
-                    MRP ₹{product.mrp}
-                  </p>
-                )}
-
-                {product.discount && (
-                  <p className="text-green-600 font-semibold">
-                    Save ₹{product.discount}
-                  </p>
-                )}
-
-                <p className="text-2xl text-yellow-600 font-bold mt-2">
-                  ₹{product.price}
+                <p className="text-gray-500 line-through mt-2">
+                  MRP ₹{product.mrp}
                 </p>
+              )}
 
-                {cartItem ? (
-                  <div className="flex items-center justify-center gap-4 mt-4">
+              {product.discount && (
+                <p className="text-green-600 font-semibold">
+                  Save ₹{product.discount}
+                </p>
+              )}
 
-                    <button
-                      onClick={() => decreaseQuantity(product.id)}
-                      className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
-                    >
-                      ➖
-                    </button>
+              <p className="text-2xl text-yellow-600 font-bold mt-2">
+                ₹{product.price}
+              </p>
 
-                    <span className="text-xl font-bold">
-                      {cartItem.quantity}
-                    </span>
+              {cartItem ? (
+                <div className="flex items-center justify-center gap-4 mt-4">
 
-                    <button
-                      onClick={() => increaseQuantity(product.id)}
-                      className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
-                    >
-                      ➕
-                    </button>
-
-                  </div>
-                ) : (
                   <button
-                    onClick={() => addToCart(product)}
-                    className="w-full bg-green-600 text-white py-2 rounded-lg mt-4 hover:bg-green-700"
+                    onClick={() => decreaseQuantity(product.id)}
+                    className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
                   >
-                    Add to Cart 🛒
+                    ➖
                   </button>
-                )}
+
+                  <span className="text-xl font-bold">
+                    {cartItem.quantity}
+                  </span>
+
+                  <button
+                    onClick={() => increaseQuantity(product.id)}
+                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+                  >
+                    ➕
+                  </button>
+
+                </div>
+              ) : (
+                <button
+                  onClick={() => addToCart(product)}
+                  className="w-full bg-green-600 text-white py-2 rounded-lg mt-4 hover:bg-green-700"
+                >
+                  Add to Cart 🛒
+                </button>
+              )}
 
             </div>
 
@@ -193,6 +189,22 @@ export default function ProductsPage() {
         })}
 
       </div>
+
+      {/* Floating Cart Button */}
+      <Link
+        href="/checkout"
+        className="fixed bottom-6 right-6 bg-black text-white px-5 py-4 rounded-full shadow-xl hover:bg-yellow-500 hover:text-black transition-all z-50 flex items-center gap-2"
+      >
+        🛒 Cart
+
+        <span className="bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
+          {cart.reduce(
+            (total, item) => total + item.quantity,
+            0
+          )}
+        </span>
+
+      </Link>
 
     </main>
   );
