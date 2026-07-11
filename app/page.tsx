@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
-import FeaturedProducts from "@/components/FeaturedProducts";
+
 
 export default function Home() {
   return (
@@ -153,21 +153,7 @@ export default function Home() {
 
           </div>
         </section>
-        {/* Featured Products */}
-        <section className="py-16 bg-gray-100">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-              Featured Products
-            </h2>
-
-            <div id="products">
-              <FeaturedProducts />
-            </div>
-
-          </div>
-        </section>
-
+        
         {/* Footer */}
         <footer className="bg-gray-900 text-gray-300 py-10">
           <div className="max-w-7xl mx-auto px-4 text-center">
