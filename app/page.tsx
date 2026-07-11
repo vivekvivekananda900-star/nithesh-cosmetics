@@ -40,7 +40,7 @@ export default function Home() {
                 rel="noopener noreferrer"
               >
                 <button className="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-xl font-bold transition shadow-lg w-full sm:w-auto">
-                  WhatsApp Us
+                  💬 WhatsApp Us
                 </button>
               </a>
 
@@ -48,11 +48,6 @@ export default function Home() {
 
           </div>
         </section>
-
-        {/* Featured Products */}
-        <div id="products">
-          <FeaturedProducts />
-        </div>
 
         {/* Categories */}
         <section className="py-16 bg-gray-100">
@@ -98,6 +93,7 @@ export default function Home() {
 
           </div>
         </section>
+
         {/* About */}
         <section className="bg-white py-20">
           <div className="max-w-6xl mx-auto px-4 text-center">
@@ -143,16 +139,30 @@ export default function Home() {
                 rel="noopener noreferrer"
               >
                 <button className="bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-xl font-bold transition w-full sm:w-auto">
-                  WhatsApp
+                  💬 WhatsApp
                 </button>
               </a>
 
               <a href="tel:+919676578296">
                 <button className="bg-yellow-500 hover:bg-yellow-400 text-black px-8 py-3 rounded-xl font-bold transition w-full sm:w-auto">
-                  Call Now
+                  📞 Call Now
                 </button>
               </a>
 
+            </div>
+
+          </div>
+        </section>
+        {/* Featured Products */}
+        <section className="py-16 bg-gray-100">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+              Featured Products
+            </h2>
+
+            <div id="products">
+              <FeaturedProducts />
             </div>
 
           </div>
@@ -175,7 +185,7 @@ export default function Home() {
             </p>
 
             <p className="mt-6 text-sm">
-              © 2026 Nithesh Cosmetics. vivek All Rights Reserved.
+              © 2026 Nithesh Cosmetics. Vivek. All Rights Reserved.
             </p>
 
           </div>
