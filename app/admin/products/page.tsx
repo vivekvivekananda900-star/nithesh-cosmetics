@@ -26,24 +26,28 @@ export default function AdminProducts() {
   const [search, setSearch] = useState("");
 
   const fetchProducts = async () => {
-    const snapshot = await getDocs(collection(db, "products"));
+    try {
+      const snapshot = await getDocs(collection(db, "products"));
 
-    const list: Product[] = snapshot.docs.map((docSnap) => {
-      const data = docSnap.data();
+      const list: Product[] = snapshot.docs.map((docSnap) => {
+        const data = docSnap.data();
 
-      return {
-        id: docSnap.id,
-        name: data.name,
-        price: data.price,
-        mrp: data.mrp,
-        discount: data.discount,
-        category: data.category,
-        description: data.description,
-        image: data.image,
-      };
-    });
+        return {
+          id: docSnap.id,
+          name: data.name,
+          price: data.price,
+          mrp: data.mrp,
+          discount: data.discount,
+          category: data.category,
+          description: data.description,
+          image: data.image,
+        };
+      });
 
-    setProducts(list);
+      setProducts(list);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   useEffect(() => {
@@ -65,11 +69,14 @@ export default function AdminProducts() {
 
     if (!ok) return;
 
-    await deleteDoc(doc(db, "products", id));
-
-    alert("✅ Product Deleted Successfully");
-
-    fetchProducts();
+    try {
+      await deleteDoc(doc(db, "products", id));
+      alert("✅ Product Deleted Successfully");
+      fetchProducts();
+    } catch (error) {
+      console.error(error);
+      alert("❌ Failed to delete product");
+    }
   };
 
   return (
@@ -105,17 +112,11 @@ export default function AdminProducts() {
           <thead className="bg-black text-white">
 
             <tr>
-
               <th className="p-4">Image</th>
-
               <th className="p-4">Name</th>
-
               <th className="p-4">Category</th>
-
               <th className="p-4">Price</th>
-
               <th className="p-4">Actions</th>
-
             </tr>
 
           </thead>
@@ -152,24 +153,25 @@ export default function AdminProducts() {
                   ₹{product.price}
                 </td>
 
-                <td className="p-4 flex gap-3">
+                <td className="p-4">
+                  <div className="flex gap-2">
 
-                  <Link
-                    href={`/admin/edit-product/${product.id}`}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-                  >
-                    ✏️ Edit
-                  </Link>
+                    <Link
+                      href={`/admin/edit-product/${product.id}`}
+                      className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                    >
+                      ✏️ Edit
+                    </Link>
 
-                  <button
-                    onClick={() => deleteProduct(product.id)}
-                    className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
-                  >
-                    🗑 Delete
-                  </button>
+                    <button
+                      onClick={() => deleteProduct(product.id)}
+                      className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
+                    >
+                      🗑 Delete
+                    </button>
 
+                  </div>
                 </td>
-
               </tr>
             ))}
             </tbody>
