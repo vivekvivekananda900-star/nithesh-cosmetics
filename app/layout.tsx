@@ -5,6 +5,9 @@ import { CartProvider } from "./context/CartContext";
 export const metadata: Metadata = {
   title: "Nithesh Cosmetics",
   description: "Barber & Cosmetics Products Store",
+  verification: {
+    google: "pWtGfiF52iPtZYPNjLkqeGmXyDZrjIuB3SiGFpwASPA",
+  },
 };
 
 export const viewport: Viewport = {
