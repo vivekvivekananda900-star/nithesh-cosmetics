@@ -1,138 +1,284 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import AdminGuard from "@/components/AdminGuard";
+
 import {
   collection,
   getDocs,
-  updateDoc,
+  orderBy,
+  query,
   doc,
+  updateDoc,
+  Timestamp,
 } from "firebase/firestore";
+
 import { db } from "@/app/lib/firebase";
+
+
+interface Product {
+  name: string;
+  price: number;
+  quantity: number;
+}
+
 
 interface Order {
   id: string;
-  customer?: {
-    name?: string;
-    phone?: string;
-    address?: string;
-  };
-  items?: any[];
+
+  customerName?: string;
+
+  phone?: string;
+
+  address?: string;
+
+  products?: Product[];
+
   total?: number;
+
   status?: string;
+
+  location?: string;
 }
 
-export default function AdminOrders() {
-  const [orders, setOrders] = useState<Order[]>([]);
 
-  // 🔥 FETCH ORDERS
+
+export default function OrdersPage() {
+
+
+  const [orders, setOrders] =
+    useState<Order[]>([]);
+
+
+
   const fetchOrders = async () => {
-    try {
-      const snapshot = await getDocs(collection(db, "orders"));
 
-      const list = snapshot.docs.map((d) => ({
-        id: d.id,
-        ...d.data(),
-      })) as Order[];
+    const q = query(
+      collection(db, "orders"),
+      orderBy("createdAt", "desc")
+    );
 
-      setOrders(list);
-    } catch (error) {
-      console.log("Error fetching orders:", error);
-    }
+
+    const snapshot =
+      await getDocs(q);
+
+
+
+    const data =
+      snapshot.docs.map((item)=>({
+
+        id:item.id,
+
+        ...(item.data() as Omit<Order,"id">),
+
+      }));
+
+
+    setOrders(data);
+
   };
 
-  useEffect(() => {
+
+
+
+  useEffect(()=>{
+
     fetchOrders();
-  }, []);
 
-  // 🟢 UPDATE STATUS
-  const updateStatus = async (id: string, status: string) => {
-    try {
-      await updateDoc(doc(db, "orders", id), {
+  },[]);
+
+
+
+
+
+  const updateOrder = async(
+    id:string,
+    status:string,
+    location:string
+  )=>{
+
+
+    await updateDoc(
+
+      doc(db,"orders",id),
+
+      {
         status,
-      });
+        location,
+        updatedAt:Timestamp.now()
+      }
 
-      fetchOrders();
-    } catch (error) {
-      console.log("Error updating status:", error);
-    }
+    );
+
+
+    fetchOrders();
+
   };
+return (
+  <AdminGuard>
 
-  return (
-    <div style={{ padding: 20 }}>
-      <h1>📦 Admin Orders</h1>
+    <div className="max-w-6xl mx-auto p-6">
 
-      {orders.length === 0 ? (
-        <p>No orders found</p>
-      ) : (
-        orders
-          .filter((order) => order.customer) // 🟢 SAFE FILTER
-          .map((order) => (
-            <div
-              key={order.id}
-              style={{
-                border: "1px solid gray",
-                margin: 10,
-                padding: 10,
-                borderRadius: 8,
-              }}
+      <h1 className="text-4xl font-bold mb-8">
+        Admin Orders 📦
+      </h1>
+
+
+      {orders.map((order)=>(
+
+        <div
+          key={order.id}
+          className="border rounded-xl p-6 mb-6 shadow"
+        >
+
+          <h2 className="text-2xl font-bold">
+            {order.customerName || "Unknown Customer"}
+          </h2>
+
+
+          <p>
+            📱 {order.phone || "No Phone"}
+          </p>
+
+
+          <p>
+            📍 {order.address || "No Address"}
+          </p>
+
+
+
+          <h3 className="font-bold mt-5">
+            Products
+          </h3>
+
+
+          {order.products &&
+          order.products.length > 0 ? (
+
+            order.products.map(
+              (item,index)=>(
+
+                <p key={index}>
+
+                  {item.name}
+                  {" x "}
+                  {item.quantity}
+                  {" = "}
+                  ₹
+                  {item.price * item.quantity}
+
+                </p>
+
+              )
+
+            )
+
+          ) : (
+
+            <p className="text-gray-500">
+              No products found
+            </p>
+
+          )}
+
+
+
+          <h2 className="text-xl font-bold mt-4">
+            Total: ₹{order.total || 0}
+          </h2>
+
+
+
+          <div className="mt-5">
+
+            <label className="font-bold">
+              Order Status:
+            </label>
+
+
+            <select
+              id={`status-${order.id}`}
+              defaultValue={order.status || "Pending"}
+              className="ml-3 border p-2 rounded"
             >
-              {/* 🟢 CUSTOMER INFO (SAFE) */}
-              <h3>{order.customer?.name || "No Name"}</h3>
-              <p>{order.customer?.phone || "No Phone"}</p>
-              <p>{order.customer?.address || "No Address"}</p>
 
-              {/* TOTAL */}
-              <h4>Total: ₹{order.total || 0}</h4>
+              <option>Pending</option>
+              <option>Confirmed</option>
+              <option>Shipped</option>
+              <option>Out for Delivery</option>
+              <option>Delivered</option>
 
-              {/* STATUS */}
-              <p>
-                Status:{" "}
-                <b
-                  style={{
-                    color:
-                      order.status === "delivered"
-                        ? "green"
-                        : order.status === "shipped"
-                        ? "blue"
-                        : "orange",
-                  }}
-                >
-                  {order.status || "pending"}
-                </b>
-              </p>
+            </select>
 
-              {/* ITEMS */}
-              <details>
-                <summary>View Items</summary>
+          </div>
 
-                {order.items?.length ? (
-                  order.items.map((item: any, i: number) => (
-                    <p key={i}>
-                      {item.name} × {item.qty}
-                    </p>
-                  ))
-                ) : (
-                  <p>No items</p>
-                )}
-              </details>
 
-              {/* STATUS BUTTONS */}
-              <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
-                <button onClick={() => updateStatus(order.id, "pending")}>
-                  Pending
-                </button>
 
-                <button onClick={() => updateStatus(order.id, "shipped")}>
-                  Shipped
-                </button>
+          <div className="mt-4">
 
-                <button onClick={() => updateStatus(order.id, "delivered")}>
-                  Delivered
-                </button>
-              </div>
-            </div>
-          ))
-      )}
+            <label className="font-bold">
+              🚚 Delivery Location:
+            </label>
+
+
+            <input
+              id={`location-${order.id}`}
+              defaultValue={order.location || ""}
+              placeholder="Example: Hyderabad Hub"
+              className="ml-3 border p-2 rounded"
+            />
+
+
+
+            <button
+
+              onClick={()=>{
+
+                const status =
+                (
+                  document.getElementById(
+                    `status-${order.id}`
+                  ) as HTMLSelectElement
+                ).value;
+
+
+                const location =
+                (
+                  document.getElementById(
+                    `location-${order.id}`
+                  ) as HTMLInputElement
+                ).value;
+
+
+
+                updateOrder(
+                  order.id,
+                  status,
+                  location
+                );
+
+              }}
+
+              className="ml-3 bg-black text-white px-5 py-2 rounded"
+
+            >
+
+              Update
+
+            </button>
+
+
+          </div>
+
+
+        </div>
+
+      ))}
+
+
     </div>
-  );
+
+  </AdminGuard>
+);
+
 }

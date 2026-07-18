@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/app/lib/firebase";
 import { useCart } from "@/app/context/CartContext";
+import Link from "next/link";
 
 interface Product {
   id: string;
@@ -74,9 +75,18 @@ export default function ProductsPage() {
   return (
     <main className="min-h-screen bg-gray-100 p-8">
 
-      <h1 className="text-4xl font-bold text-center mb-8">
-        Our Products
-      </h1>
+  <div className="flex justify-between items-center mb-6">
+    <Link
+      href="/"
+      className="inline-flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition"
+    >
+      🏠 Home
+    </Link>
+  </div>
+
+  <h1 className="text-4xl font-bold text-center mb-8">
+    Our Products
+  </h1>
 
       <div className="flex flex-col md:flex-row gap-4 justify-center mb-8">
 

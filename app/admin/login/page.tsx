@@ -22,7 +22,7 @@ export default function LoginPage() {
 
       alert("✅ Login Successful");
 
-      router.push("/products");
+      router.push("/admin/orders");
     } catch (error: any) {
       alert(error.message);
     } finally {
