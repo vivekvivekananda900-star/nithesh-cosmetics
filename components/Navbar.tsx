@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, Search, ShoppingCart, User } from "lucide-react";
 import { useCart } from "@/app/context/CartContext";
+import SideDrawer from "./SideDrawer";
 
 export default function Navbar() {
   const { cart } = useCart();
-
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const cartCount = cart.reduce(
     (total, item) => total + item.quantity,
@@ -16,98 +16,96 @@ export default function Navbar() {
   );
 
   return (
-    <nav className="bg-black text-white shadow-lg sticky top-0 z-50">
+    <>
+      <header className="sticky top-0 z-50 bg-white shadow-sm border-b">
 
-      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        {/* Top Header */}
+        <div className="flex items-center justify-between px-4 py-3">
 
-        {/* Logo */}
-        <Link
-          href="/"
-          className="text-2xl font-bold text-yellow-400"
-          onClick={() => setMenuOpen(false)}
-        >
-          Nithesh Cosmetics
-        </Link>
-
-        {/* Desktop Menu */}
-        <div className="hidden md:flex items-center gap-8">
-
-          <Link href="/" className="hover:text-yellow-400">
-            Home
-          </Link>
-
-          <Link href="/products" className="hover:text-yellow-400">
-            Products
-          </Link>
-
-          <Link href="/track-order" className="hover:text-yellow-400">
-            🚚 Track
-          </Link>
-
-          <Link
-            href="/cart"
-            className="relative hover:text-yellow-400"
+          <button
+            onClick={() => setDrawerOpen(true)}
+            className="p-2 rounded-lg hover:bg-gray-100"
           >
-            🛒 Cart
+            <Menu size={26} />
+          </button>
 
-            {cartCount > 0 && (
-              <span className="absolute -top-3 -right-3 bg-red-600 text-white text-xs w-6 h-6 rounded-full flex items-center justify-center">
-                {cartCount}
-              </span>
-            )}
+          <Link href="/" className="text-xl font-extrabold text-yellow-600">
+            Nithesh Cosmetics
           </Link>
+
+          <div className="flex items-center gap-3">
+
+            <Link
+              href="/profile"
+              className="p-2 rounded-lg hover:bg-gray-100"
+            >
+              <User size={22} />
+            </Link>
+
+            <Link
+              href="/cart"
+              className="relative p-2 rounded-lg hover:bg-gray-100"
+            >
+              <ShoppingCart size={22} />
+
+              {cartCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center">
+                  {cartCount}
+                </span>
+              )}
+            </Link>
+
+          </div>
 
         </div>
 
-        {/* Mobile Menu Button */}
-        <button
-          className="md:hidden"
-          onClick={() => setMenuOpen(!menuOpen)}
-        >
-          {menuOpen ? <X size={30} /> : <Menu size={30} />}
-        </button>
+        {/* Delivery Card */}
+        <div className="px-4 pb-3">
 
-      </div>
+          <div className="rounded-xl bg-yellow-100 border border-yellow-300 p-3">
 
-      {/* Mobile Menu */}
-      {menuOpen && (
-        <div className="md:hidden bg-black border-t border-gray-700">
+            <p className="text-xs text-gray-500">
+              Delivering To
+            </p>
 
-          <Link
-            href="/"
-            onClick={() => setMenuOpen(false)}
-            className="block px-6 py-4 hover:bg-gray-900"
-          >
-            🏠 Home
-          </Link>
+            <h3 className="font-bold text-gray-800">
+              Nagarkurnool
+            </h3>
 
-          <Link
-            href="/products"
-            onClick={() => setMenuOpen(false)}
-            className="block px-6 py-4 hover:bg-gray-900"
-          >
-            📦 Products
-          </Link>
+            <p className="text-xs text-gray-600">
+              Near VKR Hospital, Naganool Road
+            </p>
 
-          <Link
-            href="/track-order"
-            onClick={() => setMenuOpen(false)}
-            className="block px-6 py-4 hover:bg-gray-900"
-          >
-            🚚 Track Order
-          </Link>
-
-          <Link
-            href="/cart"
-            onClick={() => setMenuOpen(false)}
-            className="block px-6 py-4 hover:bg-gray-900"
-          >
-            🛒 Cart ({cartCount})
-          </Link>
+          </div>
 
         </div>
-      )}
 
-    </nav>
+        {/* Search */}
+        <div className="px-4 pb-4">
+
+          <div className="flex items-center bg-gray-100 rounded-xl px-3 h-12">
+
+            <Search
+              size={20}
+              className="text-gray-500"
+            />
+
+            <input
+              type="text"
+              placeholder="Search for products..."
+              className="bg-transparent outline-none w-full ml-3 text-sm"
+            />
+
+          </div>
+
+        </div>
+
+      </header>
+
+      <SideDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+      />
+    </>
   );
 }

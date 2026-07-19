@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { CartProvider } from "./context/CartContext";
+import FloatingWhatsApp from "@/components/FloatingWhatsApp";
 
 export const metadata: Metadata = {
   title: "Nithesh Cosmetics",
@@ -29,6 +30,7 @@ export default function RootLayout({
         <CartProvider>
           {children}
         </CartProvider>
+        <FloatingWhatsApp />
       </body>
     </html>
   );

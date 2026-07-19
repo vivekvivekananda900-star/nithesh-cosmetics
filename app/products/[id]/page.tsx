@@ -1,230 +1,590 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
+import { useParams, useRouter } from "next/navigation";
+import {
+  doc,
+  getDoc,
+  collection,
+  getDocs,
+} from "firebase/firestore";
+
 import { db } from "@/app/lib/firebase";
 import { useCart } from "@/app/context/CartContext";
+
 import Link from "next/link";
 
+import {
+  ArrowLeft,
+  Heart,
+  ShoppingCart,
+  Star,
+  Truck,
+  ShieldCheck,
+} from "lucide-react";
+
+
 interface Product {
+
   id: string;
+
   name: string;
+
   price: number;
+
   mrp?: number;
+
   discount?: number;
-  category: string;
+
+  category?: string;
+
   description?: string;
+
   image?: string;
+
 }
 
-export default function ProductsPage() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [search, setSearch] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All");
 
-  const {
-    cart,
-    addToCart,
-    increaseQuantity,
-    decreaseQuantity,
-  } = useCart();
 
-  const fetchProducts = async () => {
-    const snapshot = await getDocs(
-      collection(db, "products")
-    );
 
-    const list: Product[] = snapshot.docs.map((doc) => {
-      const data = doc.data();
+export default function ProductDetailsPage() {
 
-      return {
-        id: doc.id,
-        name: data.name,
-        price: data.price,
-        mrp: data.mrp,
-        discount: data.discount,
-        category: data.category,
-        description: data.description,
-        image: data.image,
-      };
-    });
 
-    setProducts(list);
-  };
+  const params = useParams();
+
+  const id = params.id as string;
+
+
+  const router = useRouter();
+
+
+  const { addToCart } = useCart();
+
+
+
+  const [product, setProduct] =
+    useState<Product | null>(null);
+
+
+
+  const [relatedProducts, setRelatedProducts] =
+    useState<Product[]>([]);
+
+
+
+  const [loading, setLoading] =
+    useState(true);
+
+
+
 
   useEffect(() => {
-    fetchProducts();
-  }, []);
 
-  const filteredProducts = products.filter((product) => {
-    const searchMatch =
-      product.name
-        .toLowerCase()
-        .includes(search.toLowerCase()) ||
-      product.category
-        .toLowerCase()
-        .includes(search.toLowerCase());
+    if(id){
 
-    const categoryMatch =
-      selectedCategory === "All" ||
-      product.category === selectedCategory;
+      loadProduct();
 
-    return searchMatch && categoryMatch;
-  });
+    }
+
+  }, [id]);
+
+
+
+
+
+  async function loadProduct() {
+
+
+    try {
+
+
+      const productRef =
+        doc(
+          db,
+          "products",
+          id
+        );
+
+
+
+      const productSnap =
+        await getDoc(productRef);
+
+
+
+
+      if(productSnap.exists()){
+
+
+        const currentProduct = {
+
+          id: productSnap.id,
+
+          ...(productSnap.data() as Omit<Product,"id">)
+
+        };
+
+
+
+        setProduct(currentProduct);
+
+
+
+        const snapshot =
+          await getDocs(
+            collection(
+              db,
+              "products"
+            )
+          );
+
+
+
+        const related =
+          snapshot.docs
+
+          .map((doc)=>({
+
+            id:doc.id,
+
+            ...(doc.data() as Omit<Product,"id">)
+
+          }))
+
+
+          .filter(
+            (item)=>
+
+              item.category === currentProduct.category &&
+
+              item.id !== currentProduct.id
+
+          )
+
+
+          .slice(0,4);
+
+
+
+        setRelatedProducts(related);
+
+
+      }
+
+
+
+    } catch(error){
+
+      console.log(
+        "Product loading error:",
+        error
+      );
+
+
+    } finally {
+
+      setLoading(false);
+
+    }
+
+  }
+  if (loading) {
+
+    return (
+
+      <div className="h-screen flex items-center justify-center text-xl font-bold">
+
+        Loading...
+
+      </div>
+
+    );
+
+  }
+
+
+
+  if (!product) {
+
+    return (
+
+      <div className="h-screen flex items-center justify-center">
+
+        Product not found
+
+      </div>
+
+    );
+
+  }
+
+
 
   return (
-    <main className="min-h-screen bg-gray-100 p-8">
 
-  <div className="flex justify-between items-center mb-6">
-    <Link
-      href="/"
-      className="inline-flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition"
-    >
-      🏠 Home
-    </Link>
-  </div>
+    <main className="bg-gray-100 min-h-screen pb-32">
 
-  <h1 className="text-4xl font-bold text-center mb-8">
-    Our Products
-  </h1>
 
-      <div className="flex flex-col md:flex-row gap-4 justify-center mb-8">
+      {/* Header */}
 
-        <input
-          type="text"
-          placeholder="🔍 Search products..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="border rounded-lg p-3 w-full md:w-80"
+      <div className="sticky top-0 bg-white shadow z-40 px-4 py-3 flex items-center justify-between">
+
+
+        <button
+          onClick={() => router.back()}
+        >
+
+          <ArrowLeft size={26}/>
+
+        </button>
+
+
+
+        <h1 className="font-bold text-lg">
+
+          Product Details
+
+        </h1>
+
+
+
+        <Heart size={24}/>
+
+
+      </div>
+
+
+
+
+
+      {/* Product Image */}
+
+      <div className="bg-white">
+
+
+        <img
+
+          src={
+            product.image ||
+            "/placeholder.png"
+          }
+
+          alt={product.name}
+
+          className="w-full h-150 object-contain"
+
         />
 
-        <select
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-          className="border rounded-lg p-3"
-        >
-          <option value="All">
-            All Categories
-          </option>
-
-          {[
-            ...new Set(
-              products.map((p) => p.category)
-            ),
-          ].map((category) => (
-            <option
-              key={category}
-              value={category}
-            >
-              {category}
-            </option>
-          ))}
-        </select>
 
       </div>
 
-      <div className="grid md:grid-cols-3 gap-6">
-        {filteredProducts.map((product) => {
-          const cartItem = cart.find(
-            (item) => item.id === product.id
-          );
 
-          return (
-            <div
-              key={product.id}
-              className="bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition"
-            >
-              {product.image && (
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="w-full h-52 object-cover rounded-lg"
-                />
-              )}
 
-              <h2 className="text-2xl font-bold mt-4">
-                {product.name}
-              </h2>
 
-              <p className="text-gray-600">
-                {product.category}
-              </p>
 
-              {product.description && (
-                <p className="text-sm text-gray-500 mt-2">
-                  {product.description}
-                </p>
-              )}
+      {/* Product Info */}
 
-              {product.mrp && (
-                <p className="text-gray-500 line-through mt-2">
-                  MRP ₹{product.mrp}
-                </p>
-              )}
 
-              {product.discount && (
-                <p className="text-green-600 font-semibold">
-                  Save ₹{product.discount}
-                </p>
-              )}
+      <div className="bg-white mt-3 p-5 rounded-t-3xl">
 
-              <p className="text-2xl text-yellow-600 font-bold mt-2">
-                ₹{product.price}
-              </p>
 
-              {cartItem ? (
-                <div className="flex items-center justify-center gap-4 mt-4">
-                  <button
-                    onClick={() =>
-                      decreaseQuantity(product.id)
-                    }
-                    className="bg-red-600 text-white px-4 py-2 rounded-lg"
-                  >
-                    ➖
-                  </button>
+        <h2 className="text-3xl font-bold">
 
-                  <span className="text-xl font-bold">
-                    {cartItem.quantity}
-                  </span>
+          {product.name}
 
-                  <button
-                    onClick={() =>
-                      increaseQuantity(product.id)
-                    }
-                    className="bg-green-600 text-white px-4 py-2 rounded-lg"
-                  >
-                    ➕
-                  </button>
-                </div>
-              ) : (
-                <button
-                  onClick={() => addToCart(product)}
-                  className="w-full bg-green-600 text-white py-2 rounded-lg mt-4 hover:bg-green-700"
-                >
-                  Add to Cart 🛒
-                </button>
-              )}
-            </div>
-          );
-        })}
-      </div>
+        </h2>
 
-      {/* Floating Cart Button */}
-      <a
-        href="/checkout"
-        className="fixed bottom-6 right-6 bg-black text-white px-5 py-4 rounded-full shadow-xl hover:bg-yellow-500 hover:text-black transition-all z-50 flex items-center gap-2"
-      >
-        🛒 Cart
-        {cart.length > 0 && (
-          <span className="bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
-            {cart.reduce(
-              (total, item) => total + item.quantity,
-              0
-            )}
+
+
+        <p className="text-gray-500 mt-2">
+
+          {product.category}
+
+        </p>
+
+
+
+
+        <div className="flex items-center gap-2 mt-4">
+
+
+          <div className="bg-green-600 text-white px-2 py-1 rounded flex items-center">
+
+
+            <Star
+              size={14}
+              className="fill-white mr-1"
+            />
+
+            4.8
+
+
+          </div>
+
+
+
+          <span className="text-gray-500">
+
+            1,245 Ratings
+
           </span>
+
+
+        </div>
+
+
+
+
+
+        <div className="mt-5">
+
+
+          <span className="text-4xl font-bold text-green-600">
+
+            ₹{product.price}
+
+          </span>
+
+
+
+          {product.mrp && (
+
+            <span className="ml-3 text-gray-500 line-through">
+
+              ₹{product.mrp}
+
+            </span>
+
+          )}
+
+
+
+        </div>
+
+
+
+
+
+        {product.discount && (
+
+          <p className="text-green-600 font-semibold mt-2">
+
+            Save ₹{product.discount}
+
+          </p>
+
         )}
-      </a>
+
+
+
+
+
+
+        <div className="mt-6 border rounded-xl p-4 bg-green-50">
+
+
+          <div className="flex items-center gap-2">
+
+            <Truck/>
+
+            Free Delivery
+
+          </div>
+
+
+
+          <div className="flex items-center gap-2 mt-3">
+
+            <ShieldCheck/>
+
+            100% Genuine Product
+
+          </div>
+
+
+        </div>
+
+
+
+
+
+
+
+        <div className="mt-6">
+
+
+          <h3 className="font-bold text-xl mb-2">
+
+            Description
+
+          </h3>
+
+
+
+          <p className="text-gray-600 leading-7">
+
+            {product.description ||
+              "Premium quality cosmetic product."}
+
+          </p>
+
+
+        </div>
+
+
+
+
+
+
+        {/* Related Products */}
+
+
+        <div className="mt-10">
+
+
+          <h3 className="text-2xl font-bold mb-4">
+
+            Related Products
+
+          </h3>
+
+
+
+
+
+          <div className="grid grid-cols-2 gap-4">
+
+
+            {relatedProducts.map((item)=>(
+
+
+              <Link
+
+                key={item.id}
+
+                href={`/products/${item.id}`}
+
+                className="bg-gray-100 rounded-2xl overflow-hidden shadow hover:shadow-lg transition"
+
+              >
+
+
+                <img
+
+                  src={
+                    item.image ||
+                    "/placeholder.png"
+                  }
+
+                  alt={item.name}
+
+                  className="w-full h-36 object-cover"
+
+                />
+
+
+
+                <div className="p-3">
+
+
+                  <h4 className="font-semibold line-clamp-2">
+
+                    {item.name}
+
+                  </h4>
+
+
+
+                  <p className="text-green-600 font-bold mt-2">
+
+                    ₹{item.price}
+
+                  </p>
+
+
+                </div>
+
+
+
+              </Link>
+
+
+            ))}
+
+
+          </div>
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+
+
+
+
+      {/* Bottom Buttons */}
+
+
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg p-4 flex gap-3 z-50">
+
+
+
+        <button
+
+          onClick={() => addToCart(product)}
+
+          className="flex-1 bg-green-600 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2"
+
+        >
+
+
+          <ShoppingCart size={20}/>
+
+          Add to Cart
+
+
+        </button>
+
+
+
+
+
+        <button
+
+
+          onClick={() => {
+
+            addToCart(product);
+
+            router.push("/checkout");
+
+          }}
+
+
+          className="flex-1 bg-yellow-500 text-black py-4 rounded-xl font-bold"
+
+        >
+
+
+          Buy Now
+
+
+        </button>
+
+
+
+      </div>
+
+
 
     </main>
+
   );
+
+
 }

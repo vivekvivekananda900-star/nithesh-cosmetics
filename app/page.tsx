@@ -1,183 +1,155 @@
-import Link from "next/link";
 import Navbar from "@/components/Navbar";
+import BannerSlider from "@/components/BannerSlider";
+import CategorySection from "@/components/CategorySection";
+import ProductSection from "@/components/ProductSection";
+import BottomNavigation from "@/components/BottomNavigation";
+import NewArrivals from "@/components/NewArrivals";
+import LocationCard from "@/components/LocationCard";
+import Link from "next/link";
+import SearchBar from "@/components/SearchBar";
 
+<SearchBar />
 
 export default function Home() {
   return (
     <>
       <Navbar />
 
-      <main className="min-h-screen bg-gray-100">
+      <main className="min-h-screen bg-gray-50 pb-24">
 
-        {/* Hero Section */}
-        <section className="relative bg-gradient-to-r from-black via-gray-900 to-black text-white py-20 md:py-28 overflow-hidden">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-
-            <span className="inline-block bg-yellow-500 text-black px-4 py-2 rounded-full text-sm font-semibold mb-6">
-              Premium Barber & Cosmetics Store
-            </span>
-
-            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-extrabold text-yellow-400">
-              Nithesh Cosmetics
+        {/* Welcome Card */}
+        <section className="px-4 pt-4">
+          <div className="rounded-3xl bg-gradient-to-r from-yellow-500 to-orange-500 text-white p-6 shadow-xl">
+            <h1 className="text-3xl font-bold">
+              Welcome 👋
             </h1>
 
-            <p className="mt-6 max-w-3xl mx-auto text-lg md:text-xl text-gray-300">
-              Premium shaving machines, barber tools, facial products,
-              cosmetics, grooming accessories and much more at affordable prices.
+            <p className="mt-2 text-white/90">
+              Discover premium barber tools, cosmetics,
+              grooming essentials and exclusive offers.
             </p>
-
-            <div className="mt-10 flex flex-col sm:flex-row justify-center gap-4">
-
-              <Link href="/products">
-                <button className="bg-yellow-500 hover:bg-yellow-400 text-black px-8 py-4 rounded-xl font-bold transition shadow-lg w-full sm:w-auto">
-                  🛍 Shop Now
-                </button>
-              </Link>
-
-              <a
-                href="https://wa.me/919676578296"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <button className="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-xl font-bold transition shadow-lg w-full sm:w-auto">
-                  💬 WhatsApp Us
-                </button>
-              </a>
-
-            </div>
-
           </div>
         </section>
+
+        {/* Banner */}
+        <BannerSlider />
 
         {/* Categories */}
-        <section className="py-16 bg-gray-100">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <CategorySection />
 
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-              Shop by Category
-            </h2>
+        {/* Offer Banner */}
+        <section className="px-4 mt-8">
+          <div className="rounded-3xl bg-green-600 text-white p-6 flex items-center justify-between">
+            <div>
+              <p className="text-sm">
+                Limited Time
+              </p>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+              <h2 className="text-2xl font-bold">
+                30% OFF
+              </h2>
 
-              <div className="bg-white rounded-2xl shadow-lg p-6 text-center hover:shadow-2xl hover:-translate-y-2 transition">
-                <div className="text-5xl mb-4">✂️</div>
-                <h3 className="font-bold">Shaving Machines</h3>
-              </div>
+              <p className="text-sm mt-1">
+                On selected products
+              </p>
+            </div>
 
-              <div className="bg-white rounded-2xl shadow-lg p-6 text-center hover:shadow-2xl hover:-translate-y-2 transition">
-                <div className="text-5xl mb-4">💈</div>
-                <h3 className="font-bold">Barber Items</h3>
-              </div>
+            <div className="text-6xl">
+              🎁
+            </div>
+          </div>
+        </section>
 
-              <div className="bg-white rounded-2xl shadow-lg p-6 text-center hover:shadow-2xl hover:-translate-y-2 transition">
-                <div className="text-5xl mb-4">🧴</div>
-                <h3 className="font-bold">Facial Products</h3>
-              </div>
+        {/* Products */}
+        <ProductSection />
 
-              <div className="bg-white rounded-2xl shadow-lg p-6 text-center hover:shadow-2xl hover:-translate-y-2 transition">
-                <div className="text-5xl mb-4">💄</div>
-                <h3 className="font-bold">Cosmetics</h3>
-              </div>
+        {/* Why Choose Us */}
+        <section className="px-4 mt-10">
+          <h2 className="text-2xl font-bold mb-4">
+            Why Choose Us?
+          </h2>
 
-              <div className="bg-white rounded-2xl shadow-lg p-6 text-center hover:shadow-2xl hover:-translate-y-2 transition">
-                <div className="text-5xl mb-4">🪮</div>
-                <h3 className="font-bold">Accessories</h3>
-              </div>
+          <div className="grid grid-cols-2 gap-4">
 
-              <div className="bg-white rounded-2xl shadow-lg p-6 text-center hover:shadow-2xl hover:-translate-y-2 transition">
-                <div className="text-5xl mb-4">➕</div>
-                <h3 className="font-bold">More</h3>
-              </div>
+            <div className="bg-white rounded-2xl p-5 shadow">
+              <div className="text-4xl">🚚</div>
 
+              <h3 className="font-semibold mt-2">
+                Fast Delivery
+              </h3>
+
+              <p className="text-sm text-gray-500">
+                Quick and reliable shipping.
+              </p>
+            </div>
+
+            <div className="bg-white rounded-2xl p-5 shadow">
+              <div className="text-4xl">💯</div>
+
+              <h3 className="font-semibold mt-2">
+                Original Products
+              </h3>
+
+              <p className="text-sm text-gray-500">
+                100% genuine quality.
+              </p>
+            </div>
+
+            <div className="bg-white rounded-2xl p-5 shadow">
+              <div className="text-4xl">💳</div>
+
+              <h3 className="font-semibold mt-2">
+                Secure Payment
+              </h3>
+
+              <p className="text-sm text-gray-500">
+                Safe and trusted checkout.
+              </p>
+            </div>
+
+            <div className="bg-white rounded-2xl p-5 shadow">
+              <div className="text-4xl">📞</div>
+
+              <h3 className="font-semibold mt-2">
+                Customer Support
+              </h3>
+
+              <p className="text-sm text-gray-500">
+                Friendly support anytime.
+              </p>
             </div>
 
           </div>
         </section>
-
-        {/* About */}
-        <section className="bg-white py-20">
-          <div className="max-w-6xl mx-auto px-4 text-center">
-
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">
-              About Nithesh Cosmetics
+        {/* Explore */}
+        <section className="px-4 mt-10">
+          <div className="bg-white rounded-3xl shadow p-6 text-center">
+            <h2 className="text-2xl font-bold">
+              Explore More Products
             </h2>
 
-            <p className="text-gray-600 text-lg leading-8 max-w-4xl mx-auto">
-              Nithesh Cosmetics is your trusted destination for premium barber
-              tools, shaving machines, facial products, cosmetics, grooming
-              accessories, and many more quality products at affordable prices.
-              We are committed to providing genuine products with excellent
-              customer service.
+            <p className="text-gray-500 mt-2">
+              Browse our complete collection.
             </p>
 
+            <Link
+              href="/products"
+              className="inline-block mt-5 bg-orange-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-orange-600 transition"
+            >
+              View All Products
+            </Link>
           </div>
         </section>
 
-        {/* Contact */}
-        <section className="bg-black text-white py-20">
-          <div className="max-w-6xl mx-auto px-4 text-center">
+        {/* New Arrivals */}
+        <NewArrivals />
 
-            <h2 className="text-3xl md:text-4xl font-bold text-yellow-400 mb-6">
-              Contact Us
-            </h2>
-
-            <p className="text-lg text-gray-300 leading-8">
-              📍 Near VKR Hospital
-              <br />
-              Naganool Road
-              <br />
-              Nagarkurnool - 509209
-              <br />
-              📞 +91 9676578296
-            </p>
-
-            <div className="mt-10 flex flex-col sm:flex-row justify-center gap-4">
-
-              <a
-                href="https://wa.me/919676578296"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <button className="bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-xl font-bold transition w-full sm:w-auto">
-                  💬 WhatsApp
-                </button>
-              </a>
-
-              <a href="tel:+919676578296">
-                <button className="bg-yellow-500 hover:bg-yellow-400 text-black px-8 py-3 rounded-xl font-bold transition w-full sm:w-auto">
-                  📞 Call Now
-                </button>
-              </a>
-
-            </div>
-
-          </div>
-        </section>
-        
-        {/* Footer */}
-        <footer className="bg-gray-900 text-gray-300 py-10">
-          <div className="max-w-7xl mx-auto px-4 text-center">
-
-            <h3 className="text-2xl font-bold text-yellow-400">
-              Nithesh Cosmetics
-            </h3>
-
-            <p className="mt-2">
-              Premium Barber & Cosmetics Products
-            </p>
-
-            <p className="mt-4">
-              Thank you for shopping with us ❤️
-            </p>
-
-            <p className="mt-6 text-sm">
-              © 2026 Nithesh Cosmetics. Vivek. All Rights Reserved.
-            </p>
-
-          </div>
-        </footer>
+        {/* Store Location */}
+        <LocationCard />
 
       </main>
+
+      <BottomNavigation />
     </>
   );
 }
