@@ -25,21 +25,23 @@ ShieldCheck,
 
 interface Product {
 
-id: string;
+  id: string;
 
-name: string;
+  name: string;
 
-price: number;
+  price: number;
 
-mrp?: number;
+  mrp?: number;
 
-discount?: number;
+  discount?: number;
 
-category?: string;
+  category?: string;
 
-description?: string;
+  description?: string;
 
-image?: string;
+  image?: string;
+
+  stock?: number;
 
 }
 
@@ -95,13 +97,30 @@ try {
   if(productSnap.exists()){  
 
 
-    const currentProduct = {  
+    const data = productSnap.data();
 
-      id: productSnap.id,  
 
-      ...(productSnap.data() as Omit<Product,"id">)  
+const currentProduct = {
 
-    };  
+  id: productSnap.id,
+
+  name: data.name || "",
+
+  price: Number(data.price) || 0,
+
+  mrp: Number(data.mrp) || 0,
+
+  discount: Number(data.discount) || 0,
+
+  category: data.category || "",
+
+  description: data.description || "",
+
+  image: data.image || "",
+
+  stock: Number(data.stock) || 0,
+
+};
 
 
 
@@ -454,23 +473,52 @@ duration-300
 
 
 
-{/* Stock */}
+{/* Stock Status */}
+
+{
+(product.stock ?? 0) > 0 ? (
 
 <span className="
-  bg-green-100
-  dark:bg-green-900
-  text-green-700
-  dark:text-green-300
-  px-3
-  py-1
-  rounded-full
-  text-sm
-  font-semibold
+bg-green-100
+dark:bg-green-900
+text-green-700
+dark:text-green-300
+px-3
+py-1
+rounded-full
+text-sm
+font-semibold
 ">
 
-  🟢 In Stock
+🟢 In Stock ({product.stock})
 
 </span>
+
+)
+
+:
+
+(
+
+<span className="
+bg-red-100
+dark:bg-red-900
+text-red-700
+dark:text-red-300
+px-3
+py-1
+rounded-full
+text-sm
+font-semibold
+">
+
+🔴 Out of Stock
+
+</span>
+
+)
+
+}
 
 
 
@@ -772,22 +820,25 @@ className="
 {/* Action Buttons */}
 
 <div
-className="
-mt-8
-flex
-flex-col
-sm:flex-row
-gap-3
-"
+  className="
+    mt-8
+    flex
+    flex-col
+    sm:flex-row
+    gap-3
+  "
 >
 
+  {/* Add To Cart */}
+
   <button
+
+    disabled={(product.stock ?? 0) <= 0}
+
     onClick={() => addToCart(product)}
-    className="
+
+    className={`
       flex-1
-      bg-green-600
-      hover:bg-green-700
-      text-white
       py-4
       rounded-xl
       font-bold
@@ -797,39 +848,92 @@ gap-3
       gap-2
       transition
       active:scale-95
-     hover:shadow-lg
-    "
+      hover:shadow-lg
+
+      ${
+        (product.stock ?? 0) <= 0
+
+        ?
+
+        "bg-gray-400 cursor-not-allowed text-white"
+
+        :
+
+        "bg-green-600 hover:bg-green-700 text-white"
+
+      }
+
+    `}
+
   >
 
     <ShoppingCart size={20} />
 
-    Add to Cart
+    {
+      (product.stock ?? 0) > 0
+      ?
+      "Add to Cart"
+      :
+      "Out of Stock"
+    }
 
   </button>
 
 
 
 
+
+  {/* Buy Now */}
+
   <button
+
+    disabled={(product.stock ?? 0) <= 0}
+
     onClick={() => {
-      addToCart(product);
-      router.push("/checkout");
+
+      if((product.stock ?? 0) > 0){
+
+        addToCart(product);
+
+        router.push("/checkout");
+
+      }
+
     }}
-    className="
-  flex-1
-  bg-yellow-500
-  hover:bg-yellow-600
-  text-black
-  py-4
-  rounded-xl
-  font-bold
-  active:scale-95
-  hover:shadow-lg
-  transition
-"
+
+    className={`
+      flex-1
+      py-4
+      rounded-xl
+      font-bold
+      transition
+      active:scale-95
+      hover:shadow-lg
+
+      ${
+        (product.stock ?? 0) <= 0
+
+        ?
+
+        "bg-gray-400 cursor-not-allowed text-white"
+
+        :
+
+        "bg-yellow-500 hover:bg-yellow-600 text-black"
+
+      }
+
+    `}
+
   >
 
-    ⚡ Buy Now
+    {
+      (product.stock ?? 0) > 0
+      ?
+      "⚡ Buy Now"
+      :
+      "Unavailable"
+    }
 
   </button>
 
