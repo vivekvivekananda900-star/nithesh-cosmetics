@@ -9,20 +9,33 @@ import { useSearchParams } from "next/navigation";
 
 
 interface Product {
+
   id: string;
+
   name: string;
+
   price: number;
+
   mrp?: number;
+
   discount?: number;
+
   category: string;
+
   description?: string;
+
   image?: string;
+
   rating?: number;
+
   deliveryFee?: number;
+
 }
 
 
+
 export default function ProductsContent() {
+
 
   const searchParams = useSearchParams();
 
@@ -30,16 +43,20 @@ export default function ProductsContent() {
     searchParams.get("search") || "";
 
 
+
   const [products,setProducts] =
     useState<Product[]>([]);
+
 
 
   const [search,setSearch] =
     useState("");
 
 
+
   const [selectedCategory,setSelectedCategory] =
     useState("All");
+
 
 
   const {
@@ -47,15 +64,21 @@ export default function ProductsContent() {
     addToCart,
     increaseQuantity,
     decreaseQuantity,
+
   } = useCart();
+
+
 
 
 
   useEffect(()=>{
 
+
     const fetchProducts = async()=>{
 
+
       try{
+
 
         const snapshot =
           await getDocs(
@@ -63,72 +86,125 @@ export default function ProductsContent() {
           );
 
 
+
         const list:Product[] =
+
           snapshot.docs.map((doc)=>{
+
 
             const data = doc.data();
 
+
+
             return {
+
+
               id: doc.id,
-              name: data.name || "",
-              price: Number(data.price) || 0,
-              mrp: Number(data.mrp) || 0,
-              discount: Number(data.discount) || 0,
-              category: data.category || "",
-              description: data.description || "",
-              image: data.image || "",
-              rating: Number(data.rating) || 4.8,
-              deliveryFee: Number(data.deliveryFee) || 0,
+
+
+              name:
+                data.name || "",
+
+
+              price:
+                Number(data.price) || 0,
+
+
+              mrp:
+                Number(data.mrp) || 0,
+
+
+              discount:
+                Number(data.discount) || 0,
+
+
+              category:
+                data.category || "",
+
+
+              description:
+                data.description || "",
+
+
+              image:
+                data.image || "",
+
+
+              rating:
+                Number(data.rating) || 4.8,
+
+
+              deliveryFee:
+                Number(data.deliveryFee) || 0,
+
+
             };
 
+
           });
+
 
 
         setProducts(list);
 
 
-      }catch(error){
+
+      }
+      catch(error){
 
         console.log(
-          "Product error",
+          "Product loading error:",
           error
         );
 
       }
 
+
     };
 
 
+
     fetchProducts();
+
+
 
   },[]);
 
 
 
+
+
+
+
   const filteredProducts =
+
     products.filter((product)=>{
 
 
-      const text =
+      const searchText =
         (search || urlSearch)
         .toLowerCase();
 
 
 
       const searchMatch =
+
         product.name
         .toLowerCase()
-        .includes(text)
+        .includes(searchText)
 
         ||
 
         product.category
         .toLowerCase()
-        .includes(text);
+        .includes(searchText);
+
+
 
 
 
       const categoryMatch =
+
         selectedCategory === "All"
 
         ||
@@ -147,45 +223,95 @@ export default function ProductsContent() {
 
 
 
+
+
+
   return (
 
-    <main className="min-h-screen bg-gray-100 p-4">
+    <main className="
+      min-h-screen
+      bg-gray-100
+      p-4
+    ">
+
 
       <Link
         href="/"
-        className="bg-green-600 text-white px-4 py-2 rounded-lg"
+        className="
+          inline-block
+          bg-green-600
+          text-white
+          px-4
+          py-2
+          rounded-lg
+        "
       >
         🏠 Home
       </Link>
 
 
-      <h1 className="text-3xl font-bold text-center my-6">
+
+      <h1 className="
+        text-3xl
+        font-bold
+        text-center
+        my-6
+      ">
         Our Products
       </h1>
 
 
 
-      <div className="flex flex-col md:flex-row gap-4 mb-6">
+
+
+      <div className="
+        flex
+        flex-col
+        md:flex-row
+        gap-4
+        mb-6
+      ">
 
 
         <input
+
           type="text"
+
           placeholder="🔍 Search products..."
+
           value={search}
+
           onChange={(e)=>
             setSearch(e.target.value)
           }
-          className="border rounded-lg p-3 flex-1"
+
+          className="
+            border
+            rounded-lg
+            p-3
+            flex-1
+          "
+
         />
 
 
 
         <select
+
           value={selectedCategory}
+
           onChange={(e)=>
-            setSelectedCategory(e.target.value)
+            setSelectedCategory(
+              e.target.value
+            )
           }
-          className="border rounded-lg p-3"
+
+          className="
+            border
+            rounded-lg
+            p-3
+          "
+
         >
 
           <option value="All">
@@ -196,15 +322,19 @@ export default function ProductsContent() {
           {
             [...new Set(
               products.map(
-                p=>p.category
+                (p)=>p.category
               )
-            )].map((category)=>(
+            )]
+
+            .map((category)=>(
 
               <option
                 key={category}
                 value={category}
               >
+
                 {category}
+
               </option>
 
             ))
@@ -213,12 +343,19 @@ export default function ProductsContent() {
 
         </select>
 
+
       </div>
 
 
 
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+
+      <div className="
+        grid
+        grid-cols-2
+        md:grid-cols-4
+        gap-4
+      ">
 
 
         {
@@ -227,7 +364,8 @@ export default function ProductsContent() {
 
             const cartItem =
               cart.find(
-                item=>item.id===product.id
+                (item)=>
+                  item.id === product.id
               );
 
 
@@ -236,79 +374,315 @@ export default function ProductsContent() {
 
               <div
                 key={product.id}
-                className="bg-white p-3 rounded-xl shadow"
+                className="
+                  bg-white
+                  p-3
+                  rounded-xl
+                  shadow
+                "
               >
 
 
                 <Link href={`/products/${product.id}`}>
 
                   <img
+
                     src={
                       product.image ||
                       "/placeholder.png"
                     }
+
                     alt={product.name}
-                    className="w-full h-32 object-contain"
+
+                    className="
+                      w-full
+                      h-32
+                      object-contain
+                      rounded-lg
+                    "
+
                   />
+
+                </Link>
+                <Link href={`/products/${product.id}`}>
+
+                  <h2 className="
+                    font-bold
+                    text-lg
+                    mt-2
+                    line-clamp-2
+                  ">
+                    {product.name}
+                  </h2>
 
                 </Link>
 
 
 
-                <h2 className="font-bold mt-2">
-                  {product.name}
-                </h2>
+                <p className="text-gray-600 text-sm">
+                  {product.category}
+                </p>
 
 
-                <p>
+
+
+
+                <div className="
+                  flex
+                  items-center
+                  gap-2
+                  mt-2
+                ">
+
+                  <span className="
+                    bg-green-600
+                    text-white
+                    text-xs
+                    px-2
+                    py-1
+                    rounded
+                  ">
+                    ⭐ {product.rating}
+                  </span>
+
+
+                  <span className="text-xs text-gray-500">
+                    1245 Ratings
+                  </span>
+
+                </div>
+
+
+
+
+
+                {
+                  product.description && (
+
+                    <p className="
+                      text-xs
+                      text-gray-500
+                      mt-2
+                      line-clamp-2
+                    ">
+                      {product.description}
+                    </p>
+
+                  )
+                }
+
+
+
+
+
+                {
+                  product.mrp && (
+
+                    <p className="
+                      text-gray-400
+                      line-through
+                      text-sm
+                    ">
+                      MRP ₹{product.mrp}
+                    </p>
+
+                  )
+                }
+
+
+
+
+
+                {
+                  product.discount && (
+
+                    <p className="
+                      text-green-600
+                      text-sm
+                      font-semibold
+                    ">
+                      Save ₹{product.discount}
+                    </p>
+
+                  )
+                }
+
+
+
+
+
+                <p className="
+                  text-xl
+                  font-bold
+                  text-yellow-600
+                  mt-2
+                ">
                   ₹{product.price}
                 </p>
 
 
 
+
+
+                <p className="
+                  text-xs
+                  text-gray-600
+                ">
+
+                  🚚
+
+                  {
+                    product.deliveryFee &&
+                    product.deliveryFee > 0
+
+                    ?
+
+                    ` Delivery ₹${product.deliveryFee}`
+
+                    :
+
+                    " Free Delivery"
+
+                  }
+
+                </p>
+
+
+
+
+
                 {
-                  cartItem ?
+                  cartItem ? (
 
-                  <div className="flex justify-center gap-4 mt-3">
-
-                    <button
-                      onClick={()=>
-                        decreaseQuantity(product.id)
-                      }
-                      className="bg-red-500 text-white px-3 rounded"
-                    >
-                      -
-                    </button>
+                    <div className="
+                      flex
+                      justify-center
+                      items-center
+                      gap-4
+                      mt-3
+                    ">
 
 
-                    <span>
-                      {cartItem.quantity}
-                    </span>
+                      <button
+
+                        onClick={()=>
+                          decreaseQuantity(product.id)
+                        }
+
+                        className="
+                          bg-red-500
+                          text-white
+                          px-3
+                          py-1
+                          rounded
+                        "
+
+                      >
+                        ➖
+                      </button>
 
 
-                    <button
-                      onClick={()=>
-                        increaseQuantity(product.id)
-                      }
-                      className="bg-green-600 text-white px-3 rounded"
-                    >
-                      +
-                    </button>
+
+                      <span className="font-bold">
+                        {cartItem.quantity}
+                      </span>
 
 
-                  </div>
 
+
+                      <button
+
+                        onClick={()=>
+                          increaseQuantity(product.id)
+                        }
+
+                        className="
+                          bg-green-600
+                          text-white
+                          px-3
+                          py-1
+                          rounded
+                        "
+
+                      >
+                        ➕
+                      </button>
+
+
+                    </div>
+
+
+                  )
 
                   :
 
-                  <button
-                    onClick={()=>
-                      addToCart(product)
-                    }
-                    className="w-full bg-green-600 text-white py-2 mt-3 rounded"
-                  >
-                    🛒 Add to Cart
-                  </button>
+                  (
+
+                  <>
+
+
+                    <button
+
+                      onClick={()=>
+                        addToCart(product)
+                      }
+
+                      className="
+                        w-full
+                        bg-green-600
+                        text-white
+                        py-2
+                        rounded-lg
+                        mt-3
+                      "
+
+                    >
+
+                      🛒 Add to Cart
+
+                    </button>
+
+
+
+
+
+                    <button
+
+                      onClick={()=>{
+
+                        addToCart(product);
+
+
+                        setTimeout(()=>{
+
+                          window.location.href =
+                            "/checkout";
+
+                        },200);
+
+
+                      }}
+
+                      className="
+                        w-full
+                        bg-yellow-500
+                        text-black
+                        py-2
+                        rounded-lg
+                        mt-2
+                        font-bold
+                      "
+
+                    >
+
+                      ⚡ Buy Now
+
+                    </button>
+
+
+                  </>
+
+                  )
 
                 }
 
@@ -320,10 +694,81 @@ export default function ProductsContent() {
 
 
           })
+
         }
 
 
       </div>
+
+
+
+
+
+
+      {/* Floating Cart */}
+
+
+      <Link
+
+        href="/checkout"
+
+        className="
+          fixed
+          bottom-6
+          right-6
+          bg-black
+          text-white
+          px-5
+          py-3
+          rounded-full
+          shadow-xl
+          flex
+          items-center
+          gap-2
+          z-50
+        "
+
+      >
+
+        🛒 Cart
+
+
+
+        {
+
+          cart.length > 0 && (
+
+            <span className="
+              bg-red-600
+              rounded-full
+              w-6
+              h-6
+              flex
+              items-center
+              justify-center
+              text-xs
+            ">
+
+
+              {
+                cart.reduce(
+                  (total,item)=>
+                    total + item.quantity,
+                  0
+                )
+              }
+
+
+            </span>
+
+          )
+
+        }
+
+
+      </Link>
+
+
 
 
     </main>
