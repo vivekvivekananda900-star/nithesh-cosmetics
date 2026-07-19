@@ -2,13 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { auth, db } from "@/app/lib/firebase";
+
 import {
   collection,
   getDocs,
   query,
   where,
-  orderBy,
 } from "firebase/firestore";
+
 import { onAuthStateChanged } from "firebase/auth";
 
 
@@ -26,9 +27,14 @@ export default function MyOrdersPage() {
       (user) => {
 
         if (user) {
+
           fetchOrders(user.uid);
+
         } else {
+
+          setOrders([]);
           setLoading(false);
+
         }
 
       }
@@ -43,26 +49,23 @@ export default function MyOrdersPage() {
 
 
 
-  const fetchOrders = async (uid:string) => {
+
+  const fetchOrders = async (uid: string) => {
 
     try {
 
       const q = query(
 
-        collection(db,"orders"),
+        collection(db, "orders"),
 
         where(
           "userId",
           "==",
           uid
-        ),
-
-        orderBy(
-          "createdAt",
-          "desc"
         )
 
       );
+
 
 
       const snapshot =
@@ -70,12 +73,12 @@ export default function MyOrdersPage() {
 
 
 
-      const data =
-        snapshot.docs.map((doc)=>({
+      const data: any[] =
+        snapshot.docs.map((doc) => ({
 
           id: doc.id,
 
-          ...doc.data()
+          ...doc.data(),
 
         }));
 
@@ -88,7 +91,7 @@ export default function MyOrdersPage() {
     } catch(error) {
 
       console.log(
-        "Orders error:",
+        "Orders Error:",
         error
       );
 
@@ -104,15 +107,21 @@ export default function MyOrdersPage() {
 
 
 
-  if(loading){
+
+  if (loading) {
 
     return (
 
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="
+        min-h-screen
+        flex
+        items-center
+        justify-center
+        text-xl
+        font-bold
+      ">
 
-        <h2 className="text-xl font-bold">
-          Loading Orders...
-        </h2>
+        Loading Orders...
 
       </div>
 
@@ -125,12 +134,21 @@ export default function MyOrdersPage() {
 
 
 
+
   return (
 
-    <main className="min-h-screen bg-gray-100 p-5">
+    <main className="
+      min-h-screen
+      bg-gray-100
+      p-5
+    ">
 
 
-      <h1 className="text-3xl font-bold mb-6">
+      <h1 className="
+        text-3xl
+        font-bold
+        mb-6
+      ">
 
         📦 My Orders
 
@@ -143,7 +161,12 @@ export default function MyOrdersPage() {
       {
         orders.length === 0 ? (
 
-          <div className="bg-white rounded-xl p-6 shadow">
+          <div className="
+            bg-white
+            p-6
+            rounded-xl
+            shadow
+          ">
 
             <p className="text-gray-500">
 
@@ -157,13 +180,20 @@ export default function MyOrdersPage() {
         ) : (
 
 
-          orders.map((order)=> (
+          orders.map((order) => (
+
 
             <div
 
               key={order.id}
 
-              className="bg-white rounded-xl shadow p-5 mb-5"
+              className="
+                bg-white
+                rounded-xl
+                shadow
+                p-5
+                mb-5
+              "
 
             >
 
@@ -171,34 +201,34 @@ export default function MyOrdersPage() {
               <h2 className="font-bold">
 
                 Order ID:
-                <span className="text-sm ml-2">
+
+                <span className="
+                  text-sm
+                  ml-2
+                  text-gray-600
+                ">
+
                   {order.id}
+
                 </span>
 
               </h2>
 
 
 
-              <p className="mt-2">
+
+
+              <p className="mt-3">
 
                 Status:
 
-                <span
-                  className={`
-                  ml-2 font-bold
-                  ${
-                    order.status === "Delivered"
-                    ? "text-green-600"
-                    :
-                    order.status === "Shipped"
-                    ? "text-blue-600"
-                    :
-                    "text-orange-600"
-                  }
-                  `}
-                >
+                <span className="
+                  ml-2
+                  font-bold
+                  text-orange-600
+                ">
 
-                  {order.status}
+                  {order.status || "Pending"}
 
                 </span>
 
@@ -207,16 +237,42 @@ export default function MyOrdersPage() {
 
 
 
-              <p className="mt-2 font-semibold">
 
-                Total: ₹{order.total}
+              <p className="
+                mt-2
+                font-bold
+              ">
+
+                Total:
+                ₹{order.total}
 
               </p>
 
 
 
 
-              <h3 className="font-bold mt-4">
+
+              <p className="mt-2">
+
+                Delivery Address:
+
+                <span className="ml-2 text-gray-600">
+
+                  {order.address}
+
+                </span>
+
+              </p>
+
+
+
+
+
+              <h3 className="
+                font-bold
+                mt-5
+                mb-2
+              ">
 
                 Products
 
@@ -224,48 +280,70 @@ export default function MyOrdersPage() {
 
 
 
+
+
               {
-                (order.products || order.items || [])
-                .map(
-                  (item:any,index:number)=> (
+                (order.products || []).map(
+                  (item:any, index:number) => (
 
-                  <div
-                    key={index}
-                    className="border-b py-2"
-                  >
+                    <div
 
-                    {item.name}
+                      key={index}
 
-                    {" × "}
+                      className="
+                        border-b
+                        py-2
+                        flex
+                        justify-between
+                      "
 
-                    {item.quantity || item.qty || 1}
+                    >
+
+                      <span>
+
+                        {item.name}
+
+                        <br />
+
+                        Qty:
+                        {item.quantity || 1}
+
+                      </span>
 
 
-                    <span className="ml-2">
 
-                      ₹
-                      {
-                        item.price *
-                        (item.quantity || item.qty || 1)
-                      }
+                      <span className="font-bold">
 
-                    </span>
+                        ₹
+                        {
+                          item.price *
+                          (item.quantity || 1)
+                        }
+
+                      </span>
 
 
-                  </div>
+                    </div>
 
-                ))
+                  )
+                )
 
               }
 
 
 
+
+
             </div>
+
 
           ))
 
+
         )
+
       }
+
 
 
     </main>

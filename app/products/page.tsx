@@ -5,6 +5,7 @@ import Link from "next/link";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/app/lib/firebase";
 import { useCart } from "@/app/context/CartContext";
+import { useSearchParams } from "next/navigation";
 
 
 interface Product {
@@ -34,6 +35,9 @@ interface Product {
 
 
 export default function ProductsPage() {
+const searchParams = useSearchParams();
+
+const urlSearch = searchParams.get("search") || "";
 
 
   const [products,setProducts] =
@@ -167,52 +171,35 @@ export default function ProductsPage() {
 
 
 
-  const filteredProducts =
+  const filteredProducts = products.filter((product) => {
 
-    products.filter((product)=>{
+  const searchText =
+    (search || urlSearch).toLowerCase();
 
 
-      const searchMatch =
+  const searchMatch =
+    product.name
+      .toLowerCase()
+      .includes(searchText) ||
 
-        product.name
-        .toLowerCase()
-        .includes(
-          search.toLowerCase()
-        )
-
-        ||
-
-        product.category
-        .toLowerCase()
-        .includes(
-          search.toLowerCase()
-        );
+    product.category
+      .toLowerCase()
+      .includes(searchText);
 
 
 
-
-      const categoryMatch =
-
-        selectedCategory === "All"
-
-        ||
-
-        product.category === selectedCategory;
+  const categoryMatch =
+    selectedCategory === "All" ||
+    product.category === selectedCategory;
 
 
 
-      return (
-        searchMatch &&
-        categoryMatch
-      );
+  return (
+    searchMatch &&
+    categoryMatch
+  );
 
-
-    });
-
-
-
-
-
+});
 
 
   return (

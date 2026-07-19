@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCart } from "@/app/context/CartContext";
 import { useRouter } from "next/navigation";
 
@@ -8,10 +8,11 @@ import {
   collection,
   addDoc,
   Timestamp,
+  doc,
+  getDoc,
 } from "firebase/firestore";
 
-import { db } from "@/app/lib/firebase";
-
+import { db, auth } from "@/app/lib/firebase";
 import { generateInvoice } from "@/app/lib/generateInvoice";
 
 
@@ -27,24 +28,86 @@ export default function CheckoutPage() {
   const router = useRouter();
 
 
-  const [name, setName] =
-    useState("");
-
-  const [phone, setPhone] =
-    useState("");
-
-  const [address, setAddress] =
-    useState("");
+  const [name,setName] = useState("");
+  const [phone,setPhone] = useState("");
+  const [address,setAddress] = useState("");
 
 
 
 
-  const total =
+
+  useEffect(()=>{
+
+
+    const loadProfile = async()=>{
+
+
+      const user =
+        auth.currentUser;
+
+
+      if(!user) return;
+
+
+
+      const snap =
+        await getDoc(
+          doc(
+            db,
+            "users",
+            user.uid
+          )
+        );
+
+
+
+      if(snap.exists()){
+
+
+        const data =
+          snap.data();
+
+
+
+        setName(
+          data.name || ""
+        );
+
+
+        setPhone(
+          data.phone || ""
+        );
+
+
+        setAddress(
+          data.address || ""
+        );
+
+
+      }
+
+
+    };
+
+
+    loadProfile();
+
+
+  },[]);
+
+
+
+
+
+
+
+  const productTotal =
     cart.reduce(
-      (sum, item) =>
+      (sum,item)=>
         sum +
         item.price *
         item.quantity,
+
       0
     );
 
@@ -52,14 +115,105 @@ export default function CheckoutPage() {
 
 
 
-  const placeOrder = async () => {
+  // Delivery Fee
+
+  const deliveryFee =
+    productTotal >= 500
+      ? 0
+      : 50;
 
 
-    if (
+
+  const total =
+    productTotal +
+    deliveryFee;
+
+
+
+
+
+
+
+
+  // Current Location
+
+  const getCurrentLocation = ()=>{
+
+
+    if(!navigator.geolocation){
+
+      alert(
+        "Location not supported"
+      );
+
+      return;
+
+    }
+
+
+
+    navigator.geolocation.getCurrentPosition(
+
+
+      (position)=>{
+
+
+        const lat =
+          position.coords.latitude;
+
+
+        const lng =
+          position.coords.longitude;
+
+
+
+        const location =
+          `https://maps.google.com/?q=${lat},${lng}`;
+
+
+
+        setAddress(location);
+
+
+
+        alert(
+          "Current location added 📍"
+        );
+
+
+      },
+
+
+
+      ()=>{
+
+        alert(
+          "Please allow location permission"
+        );
+
+      }
+
+
+    );
+
+
+  };
+
+
+
+
+
+
+
+
+  const placeOrder = async()=>{
+
+
+    if(
       !name ||
       !phone ||
       !address
-    ) {
+    ){
 
       alert(
         "Please fill all details"
@@ -71,10 +225,11 @@ export default function CheckoutPage() {
 
 
 
-    if (cart.length === 0) {
+
+    if(cart.length===0){
 
       alert(
-        "Your cart is empty"
+        "Cart is empty"
       );
 
       return;
@@ -84,66 +239,94 @@ export default function CheckoutPage() {
 
 
 
-    try {
+
+
+    try{
+
+
+      const user =
+        auth.currentUser;
+
+
 
 
       const orderRef =
         await addDoc(
+
           collection(
             db,
             "orders"
           ),
+
           {
+
+
+            userId:
+              user?.uid || "",
+
 
             customerName:name,
 
-            phone:phone,
 
-            address:address,
+            phone,
+
+
+            address,
+
+
 
             products:cart,
 
-            total:total,
 
-            status:"Pending",
+
+            productTotal,
+
+
+
+            deliveryFee,
+
+
+
+            total,
+
+
+
+            status:
+              "Pending",
+
+
 
             createdAt:
-              Timestamp.now(),
+              Timestamp.now()
+
 
           }
-        );
-
-
-
-
-      // Generate Invoice
-
-      try {
-
-        generateInvoice(
-
-          orderRef.id,
-
-          {
-            name,
-            phone,
-            address,
-          },
-
-          cart,
-
-          total
 
         );
 
-      } catch(error) {
 
-        console.log(
-          "Invoice Error",
-          error
-        );
 
-      }
+
+
+
+
+      generateInvoice(
+
+        orderRef.id,
+
+        {
+          name,
+          phone,
+          address
+        },
+
+        cart,
+
+        total
+
+      );
+
+
 
 
 
@@ -164,6 +347,7 @@ ${phone}
 📍 Address:
 ${address}
 
+
 📦 Products:
 `;
 
@@ -178,7 +362,7 @@ ${address}
 `
 ${item.name}
 
-Quantity:
+Qty:
 ${item.quantity}
 
 Price:
@@ -194,6 +378,9 @@ Price:
 
       message +=
 `
+🚚 Delivery Fee:
+₹${deliveryFee}
+
 💰 Total:
 ₹${total}
 
@@ -203,15 +390,10 @@ Thank you 🙏`;
 
 
 
-      const whatsappNumber =
-        "919676578296";
-
-
-
 
 
       const whatsappURL =
-`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+`https://wa.me/919676578296?text=${encodeURIComponent(message)}`;
 
 
 
@@ -237,14 +419,16 @@ Thank you 🙏`;
 
 
 
-    } catch(error) {
+
+    }
+    catch(error){
 
 
       console.log(error);
 
 
       alert(
-        "Order failed. Try again."
+        "Order failed"
       );
 
 
@@ -258,9 +442,10 @@ Thank you 🙏`;
 
 
 
+
   return (
 
-    <div className="max-w-6xl mx-auto p-6">
+    <main className="max-w-6xl mx-auto p-6">
 
 
       <h1 className="text-4xl font-bold mb-8">
@@ -274,14 +459,11 @@ Thank you 🙏`;
       <div className="grid md:grid-cols-2 gap-8">
 
 
-        <div className="space-y-5">
+
+        <div className="space-y-4">
 
 
           <input
-
-            type="text"
-
-            placeholder="Full Name"
 
             value={name}
 
@@ -289,17 +471,22 @@ Thank you 🙏`;
               setName(e.target.value)
             }
 
-            className="w-full border p-3 rounded-lg"
+            placeholder="Full Name"
+
+            className="
+            w-full
+            border
+            p-3
+            rounded-lg
+            "
 
           />
 
 
 
+
+
           <input
-
-            type="tel"
-
-            placeholder="Phone Number"
 
             value={phone}
 
@@ -307,15 +494,49 @@ Thank you 🙏`;
               setPhone(e.target.value)
             }
 
-            className="w-full border p-3 rounded-lg"
+            placeholder="Phone Number"
+
+            className="
+            w-full
+            border
+            p-3
+            rounded-lg
+            "
 
           />
 
 
 
-          <textarea
 
-            placeholder="Delivery Address"
+
+
+
+          <button
+
+            onClick={getCurrentLocation}
+
+            className="
+            w-full
+            bg-blue-600
+            text-white
+            py-3
+            rounded-lg
+            font-bold
+            "
+
+          >
+
+            📍 Use Current Location
+
+          </button>
+
+
+
+
+
+
+
+          <textarea
 
             value={address}
 
@@ -323,9 +544,18 @@ Thank you 🙏`;
               setAddress(e.target.value)
             }
 
-            className="w-full border p-3 rounded-lg h-32"
+            placeholder="Delivery Address"
+
+            className="
+            w-full
+            border
+            p-3
+            rounded-lg
+            h-32
+            "
 
           />
+
 
 
         </div>
@@ -335,7 +565,13 @@ Thank you 🙏`;
 
 
 
-        <div className="border rounded-xl p-6">
+
+        <div className="
+        border
+        rounded-xl
+        p-6
+        ">
+
 
 
           <h2 className="text-2xl font-bold mb-5">
@@ -350,39 +586,30 @@ Thank you 🙏`;
 
 
             <div
-
               key={item.id}
-
-              className="flex justify-between border-b py-3"
-
+              className="
+              flex
+              justify-between
+              border-b
+              py-3
+              "
             >
 
 
-              <div>
+              <span>
 
-                <h3 className="font-semibold">
-                  {item.name}
-                </h3>
+                {item.name}
+                <br/>
+                Qty: {item.quantity}
 
-
-                <p>
-                  Qty: {item.quantity}
-                </p>
+              </span>
 
 
-              </div>
+              <b>
 
+                ₹{item.price * item.quantity}
 
-
-
-              <p className="font-bold">
-
-                ₹
-                {item.price *
-                item.quantity}
-
-              </p>
-
+              </b>
 
 
             </div>
@@ -395,7 +622,35 @@ Thank you 🙏`;
 
 
 
-          <h2 className="text-3xl font-bold mt-6">
+          <p className="mt-4">
+
+            Products:
+            ₹{productTotal}
+
+          </p>
+
+
+
+          <p>
+
+            Delivery:
+            {
+              deliveryFee === 0
+              ? "Free"
+              : `₹${deliveryFee}`
+            }
+
+          </p>
+
+
+
+
+
+          <h2 className="
+          text-3xl
+          font-bold
+          mt-5
+          ">
 
             Total:
             ₹{total}
@@ -411,7 +666,15 @@ Thank you 🙏`;
 
             onClick={placeOrder}
 
-            className="mt-6 w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-bold"
+            className="
+            mt-6
+            w-full
+            bg-green-600
+            text-white
+            py-3
+            rounded-lg
+            font-bold
+            "
 
           >
 
@@ -421,14 +684,13 @@ Thank you 🙏`;
 
 
 
-
         </div>
 
 
       </div>
 
 
-    </div>
+    </main>
 
   );
 

@@ -15,15 +15,20 @@ export default function SearchBar() {
 
     e.preventDefault();
 
-    if(search.trim()) {
+
+    const value = search.trim();
+
+
+    if(value) {
 
       router.push(
-        `/products?search=${search}`
+        `/products?search=${encodeURIComponent(value)}`
       );
 
     }
 
   };
+
 
 
   return (
@@ -33,29 +38,67 @@ export default function SearchBar() {
       className="w-full max-w-xl mx-auto"
     >
 
-      <div className="flex items-center bg-white border rounded-full overflow-hidden shadow-sm">
+      <div className="
+        flex
+        items-center
+        bg-white
+        border
+        rounded-full
+        overflow-hidden
+        shadow-sm
+      ">
+
 
         <input
+
           type="text"
-          placeholder="Search products..."
+
+          placeholder="🔍 Search products..."
+
           value={search}
+
           onChange={(e)=>
             setSearch(e.target.value)
           }
-          className="flex-1 px-5 py-3 outline-none text-black"
+
+          className="
+            flex-1
+            px-5
+            py-3
+            outline-none
+            text-black
+          "
+
         />
 
 
+
         <button
+
           type="submit"
-          className="bg-black text-white px-6 py-3"
+
+          className="
+            bg-black
+            text-white
+            px-6
+            py-3
+            hover:bg-yellow-500
+            hover:text-black
+            transition
+          "
+
         >
+
           Search
+
         </button>
 
+
       </div>
+
 
     </form>
 
   );
+
 }
