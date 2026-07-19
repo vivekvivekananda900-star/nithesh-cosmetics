@@ -527,60 +527,31 @@ export default function ProductDetailsPage() {
 
 
 
-      {/* Bottom Buttons */}
+      {product.discount && (
+  <p className="text-green-600 font-semibold mt-2">
+    Save ₹{product.discount}
+  </p>
+)}
 
+<div className="flex gap-3 mt-6">
+  <button
+    onClick={() => addToCart(product)}
+    className="flex-1 bg-green-600 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-green-700 transition"
+  >
+    <ShoppingCart size={20} />
+    Add to Cart
+  </button>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg p-4 flex gap-3 z-50">
-
-
-
-        <button
-
-          onClick={() => addToCart(product)}
-
-          className="flex-1 bg-green-600 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2"
-
-        >
-
-
-          <ShoppingCart size={20}/>
-
-          Add to Cart
-
-
-        </button>
-
-
-
-
-
-        <button
-
-
-          onClick={() => {
-
-            addToCart(product);
-
-            router.push("/checkout");
-
-          }}
-
-
-          className="flex-1 bg-yellow-500 text-black py-4 rounded-xl font-bold"
-
-        >
-
-
-          Buy Now
-
-
-        </button>
-
-
-
-      </div>
-
-
+  <button
+    onClick={() => {
+      addToCart(product);
+      router.push("/checkout");
+    }}
+    className="flex-1 bg-yellow-500 text-black py-4 rounded-xl font-bold hover:bg-yellow-600 transition"
+  >
+    Buy Now
+  </button>
+</div>
 
     </main>
 
