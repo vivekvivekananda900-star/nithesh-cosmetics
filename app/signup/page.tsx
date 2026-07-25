@@ -5,20 +5,15 @@ import { supabase } from "@/app/lib/supabase";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-
 export default function SignupPage() {
 
   const router = useRouter();
 
-
   const [name, setName] = useState("");
-
   const [email, setEmail] = useState("");
-
   const [password, setPassword] = useState("");
 
   const [loading, setLoading] = useState(false);
-
 
 
   async function handleSignup(
@@ -27,28 +22,25 @@ export default function SignupPage() {
 
     e.preventDefault();
 
-
     try {
 
       setLoading(true);
 
 
-
+      // Create Auth User
       const {
         data,
         error
       } = await supabase.auth.signUp({
 
-        email,
+        email: email.trim(),
 
         password,
 
       });
 
 
-
       if (error) throw error;
-
 
 
       if (!data.user) {
@@ -59,7 +51,24 @@ export default function SignupPage() {
 
 
 
+      // Check Session
+      const {
+        data: sessionData
+      } = await supabase.auth.getSession();
 
+
+
+      if (!sessionData.session) {
+
+        throw new Error(
+          "Email confirmation is required. Please verify your email first."
+        );
+
+      }
+
+
+
+      // Create Profile
       const {
         error: profileError
       } = await supabase
@@ -87,11 +96,7 @@ export default function SignupPage() {
       alert("✅ Account Created Successfully");
 
 
-
-      // Directly go Home
-
       router.push("/");
-
 
 
     }
@@ -112,8 +117,6 @@ export default function SignupPage() {
 
 
 
-
-
   return (
 
     <main className="
@@ -124,7 +127,6 @@ export default function SignupPage() {
       bg-orange-50
       px-4
     ">
-
 
       <form
 
@@ -156,7 +158,6 @@ export default function SignupPage() {
 
 
 
-
         <input
 
           type="text"
@@ -181,7 +182,6 @@ export default function SignupPage() {
 
 
 
-
         <input
 
           type="email"
@@ -203,7 +203,6 @@ export default function SignupPage() {
           "
 
         />
-
 
 
 
@@ -233,7 +232,6 @@ export default function SignupPage() {
 
 
 
-
         <button
 
           type="submit"
@@ -258,9 +256,7 @@ export default function SignupPage() {
             : "Create Account"
           }
 
-
         </button>
-
 
 
 
@@ -291,7 +287,6 @@ export default function SignupPage() {
 
 
         </p>
-
 
 
       </form>
