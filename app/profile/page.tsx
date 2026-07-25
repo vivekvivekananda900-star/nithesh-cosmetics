@@ -7,54 +7,54 @@ import { useRouter } from "next/navigation";
 
 export default function ProfilePage() {
 
-
   const router = useRouter();
 
 
-  const [userId,setUserId] = useState("");
+  const [userId, setUserId] = useState("");
 
-  const [name,setName] = useState("");
-  const [email,setEmail] = useState("");
+  const [name, setName] = useState("");
 
-  const [phone,setPhone] = useState("");
-  const [address,setAddress] = useState("");
+  const [email, setEmail] = useState("");
 
-  const [latitude,setLatitude] = useState<number | null>(null);
-  const [longitude,setLongitude] = useState<number | null>(null);
+  const [phone, setPhone] = useState("");
 
-  const [loading,setLoading] = useState(true);
-  const [saving,setSaving] = useState(false);
+  const [address, setAddress] = useState("");
 
+  const [latitude, setLatitude] = useState<number | null>(null);
 
+  const [longitude, setLongitude] = useState<number | null>(null);
 
 
+  const [loading, setLoading] = useState(true);
 
-  useEffect(()=>{
+  const [saving, setSaving] = useState(false);
 
+
+
+  useEffect(() => {
 
     loadProfile();
 
-
-  },[]);
-
+  }, []);
 
 
 
 
-  const loadProfile = async()=>{
+  async function loadProfile() {
 
 
     const {
-      data:{
+      data: {
         user
       }
     } = await supabase.auth.getUser();
 
 
 
-    if(!user){
+    if (!user) {
 
       router.push("/login");
+
       return;
 
     }
@@ -69,45 +69,39 @@ export default function ProfilePage() {
       data,
       error
     } = await supabase
-      .from("users")
+
+      .from("profiles")
+
       .select("*")
-      .eq("id",user.id)
+
+      .eq("uuid", user.id)
+
       .single();
 
 
 
+    if (error) {
 
-    if(data){
+      console.log(error);
 
-
-      setName(
-        data.name || ""
-      );
+    }
 
 
-      setEmail(
-        data.email || user.email || ""
-      );
+
+    if (data) {
 
 
-      setPhone(
-        data.phone || ""
-      );
+      setName(data.name || "");
 
+      setEmail(data.email || user.email || "");
 
-      setAddress(
-        data.address || ""
-      );
+      setPhone(data.phone || "");
 
+      setAddress(data.address || "");
 
-      setLatitude(
-        data.latitude || null
-      );
+      setLatitude(data.latitude || null);
 
-
-      setLongitude(
-        data.longitude || null
-      );
+      setLongitude(data.longitude || null);
 
 
     }
@@ -116,26 +110,18 @@ export default function ProfilePage() {
 
     setLoading(false);
 
-
-  };
-
+  }
 
 
 
 
 
+  function getCurrentLocation() {
 
 
+    if (!navigator.geolocation) {
 
-  const getCurrentLocation = ()=>{
-
-
-    if(!navigator.geolocation){
-
-
-      alert(
-        "Location not supported"
-      );
+      alert("Location not supported");
 
       return;
 
@@ -145,16 +131,12 @@ export default function ProfilePage() {
 
     navigator.geolocation.getCurrentPosition(
 
-      async(position)=>{
+      async(position) => {
 
 
-        const lat =
-          position.coords.latitude;
+        const lat = position.coords.latitude;
 
-
-        const lng =
-          position.coords.longitude;
-
+        const lng = position.coords.longitude;
 
 
         const mapLink =
@@ -168,79 +150,51 @@ export default function ProfilePage() {
 
 
 
-        const {
-          data:{
-            user
-          }
-        } = await supabase.auth.getUser();
+        await supabase
 
+          .from("profiles")
 
-
-        if(user){
-
-
-          await supabase
-          .from("users")
           .update({
 
-            latitude:lat,
+            latitude: lat,
 
-            longitude:lng,
+            longitude: lng,
 
-            location:mapLink
+            location: mapLink
 
           })
-          .eq(
-            "id",
-            user.id
-          );
 
-
-        }
+          .eq("uuid", userId);
 
 
 
-        alert(
-          "Location saved!"
-        );
+        alert("📍 Location saved");
 
 
       },
 
 
-      ()=>{
+      () => {
 
-
-        alert(
-          "Please allow location permission"
-        );
-
+        alert("Please allow location permission");
 
       }
 
     );
 
-
-  };
-
+  }
 
 
 
 
 
 
+  async function saveProfile() {
 
 
-  const saveProfile = async()=>{
+    if (phone.length !== 10) {
 
-
-    if(phone.length !== 10){
-
-
-      alert(
-        "Enter valid 10 digit phone number"
-      );
-
+      alert("Enter valid 10 digit phone number");
 
       return;
 
@@ -248,7 +202,7 @@ export default function ProfilePage() {
 
 
 
-    try{
+    try {
 
 
       setSaving(true);
@@ -256,95 +210,75 @@ export default function ProfilePage() {
 
 
       await supabase
-      .from("users")
-      .update({
 
-        phone,
+        .from("profiles")
 
-        address,
+        .update({
 
-        latitude,
+          phone,
 
-        longitude
+          address,
 
-      })
-      .eq(
-        "id",
-        userId
-      );
+          latitude,
 
+          longitude
 
+        })
+
+        .eq("uuid", userId);
 
 
-      alert(
-        "Profile updated successfully!"
-      );
 
+      alert("✅ Profile updated");
 
 
     }
-    catch(error){
 
+    catch(error) {
 
       console.log(error);
 
-
-      alert(
-        "Update failed"
-      );
-
+      alert("Update failed");
 
     }
-    finally{
 
+    finally {
 
       setSaving(false);
 
-
     }
 
-
-  };
-
+  }
 
 
 
 
 
 
-
-
-  const logout = async()=>{
+  async function logout() {
 
 
     await supabase.auth.signOut();
 
-
-    router.push(
-      "/login"
-    );
+    router.push("/login");
 
 
-  };
+  }
 
 
 
 
 
 
-
-
-
-  if(loading){
-
+  if (loading) {
 
     return (
 
       <div className="
-      min-h-screen
-      flex
-      items-center
-      justify-center
+        min-h-screen
+        flex
+        items-center
+        justify-center
       ">
 
         Loading Profile...
@@ -360,41 +294,37 @@ export default function ProfilePage() {
 
 
 
-
-
-
   return (
 
     <main className="
-    min-h-screen
-    bg-gray-100
-    p-4
+      min-h-screen
+      bg-orange-50
+      p-4
     ">
 
 
       <div className="
-      max-w-md
-      mx-auto
-      bg-white
-      rounded-2xl
-      shadow-xl
-      p-6
+        max-w-md
+        mx-auto
+        bg-white
+        rounded-3xl
+        shadow-xl
+        p-6
       ">
 
 
 
         <h1 className="
-        text-3xl
-        font-bold
-        text-center
-        mb-6
-        text-orange-600
+          text-3xl
+          font-black
+          text-center
+          text-orange-500
+          mb-6
         ">
 
-          👤 My Profile
+          👤 My Account
 
         </h1>
-
 
 
 
@@ -403,24 +333,22 @@ export default function ProfilePage() {
           Name
         </label>
 
-
         <input
 
-        value={name}
+          value={name}
 
-        disabled
+          disabled
 
-        className="
-        w-full
-        border
-        p-3
-        rounded-lg
-        mb-4
-        bg-gray-100
-        "
+          className="
+            w-full
+            border
+            p-3
+            rounded-xl
+            mb-4
+            bg-gray-100
+          "
 
         />
-
 
 
 
@@ -433,18 +361,18 @@ export default function ProfilePage() {
 
         <input
 
-        value={email}
+          value={email}
 
-        disabled
+          disabled
 
-        className="
-        w-full
-        border
-        p-3
-        rounded-lg
-        mb-4
-        bg-gray-100
-        "
+          className="
+            w-full
+            border
+            p-3
+            rounded-xl
+            mb-4
+            bg-gray-100
+          "
 
         />
 
@@ -452,66 +380,56 @@ export default function ProfilePage() {
 
 
 
-
         <label className="font-semibold">
-          Phone Number
+          Phone
         </label>
 
 
         <input
 
-        type="tel"
+          value={phone}
 
-        value={phone}
+          onChange={(e)=>setPhone(e.target.value)}
 
-        onChange={(e)=>
-          setPhone(e.target.value)
-        }
+          placeholder="Enter phone number"
 
-        placeholder="Enter phone number"
-
-        className="
-        w-full
-        border
-        p-3
-        rounded-lg
-        mb-4
-        "
+          className="
+            w-full
+            border
+            p-3
+            rounded-xl
+            mb-4
+          "
 
         />
-
 
 
 
 
 
         <label className="font-semibold">
-          Delivery Address
+          Address
         </label>
 
 
         <textarea
 
-        value={address}
+          value={address}
 
-        onChange={(e)=>
-          setAddress(e.target.value)
-        }
+          onChange={(e)=>setAddress(e.target.value)}
 
-        placeholder="Enter address"
+          placeholder="Delivery address"
 
-        className="
-        w-full
-        border
-        p-3
-        rounded-lg
-        mb-4
-        h-28
-        "
+          className="
+            w-full
+            border
+            p-3
+            rounded-xl
+            mb-4
+            h-28
+          "
 
         />
-
-
 
 
 
@@ -519,17 +437,17 @@ export default function ProfilePage() {
 
         <button
 
-        onClick={getCurrentLocation}
+          onClick={getCurrentLocation}
 
-        className="
-        w-full
-        bg-orange-500
-        text-white
-        py-3
-        rounded-lg
-        mb-3
-        font-bold
-        "
+          className="
+            w-full
+            bg-orange-500
+            text-white
+            py-3
+            rounded-xl
+            mb-3
+            font-bold
+          "
 
         >
 
@@ -541,28 +459,22 @@ export default function ProfilePage() {
 
 
 
-
-
         <button
 
-        onClick={saveProfile}
+          onClick={saveProfile}
 
-        className="
-        w-full
-        bg-green-600
-        text-white
-        py-3
-        rounded-lg
-        font-bold
-        "
+          className="
+            w-full
+            bg-green-600
+            text-white
+            py-3
+            rounded-xl
+            font-bold
+          "
 
         >
 
-          {
-          saving
-          ? "Saving..."
-          : "Save Profile"
-          }
+          {saving ? "Saving..." : "Save Profile"}
 
         </button>
 
@@ -570,21 +482,19 @@ export default function ProfilePage() {
 
 
 
-
-
         <button
 
-        onClick={logout}
+          onClick={logout}
 
-        className="
-        w-full
-        bg-red-600
-        text-white
-        py-3
-        rounded-lg
-        mt-4
-        font-bold
-        "
+          className="
+            w-full
+            bg-red-600
+            text-white
+            py-3
+            rounded-xl
+            mt-4
+            font-bold
+          "
 
         >
 
@@ -594,13 +504,11 @@ export default function ProfilePage() {
 
 
 
-
       </div>
 
 
     </main>
 
   );
-
 
 }

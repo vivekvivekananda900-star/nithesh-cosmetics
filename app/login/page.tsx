@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { supabase } from "@/app/lib/supabase";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 
 export default function LoginPage() {
@@ -10,16 +11,17 @@ export default function LoginPage() {
   const router = useRouter();
 
 
-  const [email,setEmail] = useState("");
-  const [password,setPassword] = useState("");
+  const [email, setEmail] = useState("");
 
-  const [loading,setLoading] = useState(false);
+  const [password, setPassword] = useState("");
+
+  const [loading, setLoading] = useState(false);
 
 
 
   async function handleLogin(
     e: React.FormEvent
-  ){
+  ) {
 
     e.preventDefault();
 
@@ -43,11 +45,7 @@ export default function LoginPage() {
 
 
 
-      if(error){
-
-        throw error;
-
-      }
+      if (error) throw error;
 
 
 
@@ -55,31 +53,31 @@ export default function LoginPage() {
 
 
 
-      if(!user){
+      if (!user) {
 
-        throw new Error(
-          "Login failed"
-        );
+        throw new Error("Login failed");
 
       }
 
 
 
 
-      // Check User Role
-
       const {
         data: profile,
         error: profileError
       } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
+
+        .from("profiles")
+
+        .select("role")
+
+        .eq("id", user.id)
+
+        .single();
 
 
 
-      if(profileError){
+      if (profileError) {
 
         throw profileError;
 
@@ -88,26 +86,38 @@ export default function LoginPage() {
 
 
 
-      if(profile?.role === "admin"){
+      alert("✅ Login Successful");
+
+
+
+      // Admin Login
+
+      if (profile?.role === "admin") {
 
         router.push("/admin");
 
       }
-      else{
 
-        router.push("/profile");
+
+      // User Login
+
+      else {
+
+        router.push("/");
 
       }
 
 
 
     }
-    catch(error:any){
+
+    catch (error: any) {
 
       alert(error.message);
 
     }
-    finally{
+
+    finally {
 
       setLoading(false);
 
@@ -121,93 +131,158 @@ export default function LoginPage() {
   return (
 
     <main className="
-    min-h-screen
-    flex
-    items-center
-    justify-center
-    bg-gray-100
+      min-h-screen
+      flex
+      items-center
+      justify-center
+      bg-orange-50
+      px-4
     ">
 
 
       <form
-      onSubmit={handleLogin}
-      className="
-      bg-white
-      p-8
-      rounded-xl
-      shadow-lg
-      w-96
-      "
+
+        onSubmit={handleLogin}
+
+        className="
+          bg-white
+          w-full
+          max-w-md
+          p-8
+          rounded-3xl
+          shadow-xl
+        "
+
       >
 
 
         <h1 className="
-        text-3xl
-        font-bold
-        text-center
-        mb-6
+          text-3xl
+          font-black
+          text-center
+          text-orange-500
+          mb-6
         ">
-          Login
+
+          Welcome Back
+
         </h1>
 
 
 
+
         <input
-        type="email"
-        placeholder="Email"
-        className="
-        w-full
-        border
-        p-3
-        rounded-lg
-        mb-4
-        "
-        value={email}
-        onChange={(e)=>
-          setEmail(e.target.value)
-        }
+
+          type="email"
+
+          placeholder="Email"
+
+          className="
+            w-full
+            border
+            p-3
+            rounded-xl
+            mb-4
+          "
+
+          value={email}
+
+          onChange={(e) =>
+            setEmail(e.target.value)
+          }
+
+          required
+
         />
 
 
 
+
         <input
-        type="password"
-        placeholder="Password"
-        className="
-        w-full
-        border
-        p-3
-        rounded-lg
-        mb-4
-        "
-        value={password}
-        onChange={(e)=>
-          setPassword(e.target.value)
-        }
+
+          type="password"
+
+          placeholder="Password"
+
+          className="
+            w-full
+            border
+            p-3
+            rounded-xl
+            mb-6
+          "
+
+          value={password}
+
+          onChange={(e) =>
+            setPassword(e.target.value)
+          }
+
+          required
+
         />
+
 
 
 
         <button
-        disabled={loading}
-        className="
-        w-full
-        bg-blue-600
-        text-white
-        py-3
-        rounded-lg
-        "
+
+          type="submit"
+
+          disabled={loading}
+
+          className="
+            w-full
+            bg-orange-500
+            text-white
+            py-3
+            rounded-xl
+            font-bold
+            hover:bg-orange-600
+            transition
+          "
+
         >
 
-        {
-          loading
-          ?
-          "Logging in..."
-          :
-          "Login"
-        }
+          {
+            loading
+              ? "Logging in..."
+              : "Login"
+          }
+
 
         </button>
+
+
+
+        <p className="
+          text-center
+          mt-5
+          text-sm
+        ">
+
+          Don't have an account?
+
+
+          <Link
+
+            href="/signup"
+
+            className="
+              ml-1
+              text-orange-500
+              font-bold
+            "
+
+          >
+
+            Create Account
+
+          </Link>
+
+
+        </p>
+
 
 
       </form>
