@@ -50,9 +50,11 @@ export default function BottomNavigation() {
   ];
 
   return (
-    <nav className="fixed bottom-4 left-4 right-4 z-50 md:hidden">
-      <div className="bg-white rounded-3xl shadow-2xl border border-gray-200">
+    <nav className="fixed bottom-3 left-3 right-3 z-50 md:hidden">
+      <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border border-orange-100">
+
         <div className="grid grid-cols-5 h-16">
+
           {menus.map((item) => {
             const Icon = item.icon;
 
@@ -68,31 +70,49 @@ export default function BottomNavigation() {
                 className="flex items-center justify-center"
               >
                 <div
-                  className={`relative flex flex-col items-center justify-center transition-all duration-300 ${
+                  className={`relative flex flex-col items-center justify-center w-full h-full transition-all duration-300 ${
                     active
-                      ? "text-white bg-orange-500 rounded-2xl px-4 py-2 shadow-lg"
+                      ? "text-orange-500"
                       : "text-gray-500"
                   }`}
                 >
                   <div className="relative">
-                    <Icon size={22} />
+
+                    <Icon
+                      size={22}
+                      strokeWidth={active ? 2.8 : 2}
+                    />
 
                     {item.badge !== undefined &&
                       item.badge > 0 && (
-                        <span className="absolute -top-2 -right-2 bg-red-600 text-white text-[10px] min-w-[18px] h-[18px] px-1 rounded-full flex items-center justify-center">
+                        <span className="absolute -top-2 -right-2 bg-red-600 text-white text-[10px] min-w-[18px] h-[18px] px-1 rounded-full flex items-center justify-center font-semibold">
                           {item.badge}
                         </span>
                       )}
+
                   </div>
 
-                  <span className="text-[11px] mt-1 font-medium">
+                  <span
+                    className={`mt-1 text-[11px] font-medium ${
+                      active
+                        ? "text-orange-500"
+                        : "text-gray-500"
+                    }`}
+                  >
                     {item.name}
                   </span>
+
+                  {active && (
+                    <div className="absolute bottom-1 w-8 h-1 rounded-full bg-orange-500" />
+                  )}
+
                 </div>
               </Link>
             );
           })}
+
         </div>
+
       </div>
     </nav>
   );

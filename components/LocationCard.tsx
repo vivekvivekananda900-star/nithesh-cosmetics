@@ -5,41 +5,47 @@ import { MapPin, Phone, Navigation } from "lucide-react";
 
 export default function LocationCard() {
   return (
-    <section className="px-4 mt-8 mb-8">
-      <div className="bg-gradient-to-r from-orange-500 to-yellow-500 rounded-3xl p-6 text-white shadow-xl">
+    <section className="px-3 sm:px-4 mt-8 mb-8">
+      <div className="bg-gradient-to-r from-orange-500 via-orange-600 to-yellow-500 rounded-2xl sm:rounded-3xl p-5 sm:p-7 text-white shadow-xl">
 
+        {/* Header */}
         <div className="flex items-center gap-3">
+
           <div className="bg-white/20 p-3 rounded-2xl">
-            <MapPin size={28} />
+            <MapPin size={26} className="sm:w-8 sm:h-8" />
           </div>
 
           <div>
-            <h2 className="text-2xl font-bold">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">
               Visit Our Store
             </h2>
 
-            <p className="text-white/90 text-sm">
+            <p className="text-white/90 text-xs sm:text-sm">
               Nithesh Cosmetics
             </p>
           </div>
+
         </div>
 
-        <div className="mt-5 bg-white rounded-2xl p-5 text-gray-800">
+        {/* Address Card */}
+        <div className="mt-5 bg-white rounded-2xl p-4 sm:p-5 text-gray-800 shadow-lg">
 
-          <h3 className="font-bold text-lg">
+          <h3 className="font-bold text-lg sm:text-xl">
             Nithesh Cosmetics
           </h3>
 
-          <p className="mt-2 text-gray-600">
+          <p className="mt-2 text-sm sm:text-base text-gray-600 leading-6">
             VKR Hospital Road,
             <br />
             Naganool Road,
             <br />
             Nagarkurnool - 509209,
+            <br />
             Telangana, India
           </p>
 
-          <div className="grid grid-cols-2 gap-3 mt-6">
+          {/* Buttons */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6">
 
             <Link
               href="https://maps.google.com/?q=VKR+Hospital+Road+Nagarkurnool+509209"
@@ -47,7 +53,7 @@ export default function LocationCard() {
               className="flex items-center justify-center gap-2 bg-orange-500 text-white py-3 rounded-xl font-semibold hover:bg-orange-600 transition"
             >
               <Navigation size={18} />
-              Directions
+              Get Directions
             </Link>
 
             <Link
@@ -59,6 +65,7 @@ export default function LocationCard() {
             </Link>
 
           </div>
+
         </div>
 
       </div>

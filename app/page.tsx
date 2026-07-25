@@ -32,8 +32,10 @@ export default function Home() {
         {/* Search */}
 
         <section className="
-          px-4
-          pt-5
+          px-3
+          sm:px-4
+          pt-4
+          sm:pt-5
         ">
 
           <div className="
@@ -59,8 +61,7 @@ export default function Home() {
         {/* Banner */}
 
         <section className="
-          mt-5
-          px-4
+          mt-4 sm:mt-5 px-3 sm:px-4
         ">
 
           <div className="
@@ -86,111 +87,59 @@ export default function Home() {
 
         {/* Premium Services */}
 
+<section className="px-3 sm:px-4 mt-8">
+  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+    {[
+      {
+        icon: "🚚",
+        title: "Free Delivery",
+        text: "Fast Shipping",
+      },
+      {
+        icon: "🔒",
+        title: "Secure Payment",
+        text: "Safe Checkout",
+      },
+      {
+        icon: "⭐",
+        title: "Premium",
+        text: "Quality Products",
+      },
+      {
+        icon: "📞",
+        title: "Support",
+        text: "24/7 Help",
+      },
+    ].map((item, index) => (
+      <div
+        key={index}
+        className="
+          bg-white
+          rounded-2xl sm:rounded-3xl
+          shadow-md
+          p-3 sm:p-5
+          text-center
+          hover:shadow-xl
+          transition
+          border
+          border-orange-200
+        "
+      >
+        <div className="text-3xl sm:text-4xl">
+          {item.icon}
+        </div>
 
-        <section className="
-          px-4
-          mt-8
-        ">
+        <h3 className="font-semibold text-sm sm:text-base mt-2 sm:mt-3">
+          {item.title}
+        </h3>
 
-
-          <div className="
-            grid
-            grid-cols-2
-            md:grid-cols-4
-            gap-4
-          ">
-
-
-
-            {[
-              {
-                icon:"🚚",
-                title:"Free Delivery",
-                text:"Fast Shipping"
-              },
-
-              {
-                icon:"🔒",
-                title:"Secure Payment",
-                text:"Safe Checkout"
-              },
-
-              {
-                icon:"⭐",
-                title:"Premium",
-                text:"Quality Products"
-              },
-
-              {
-                icon:"📞",
-                title:"Support",
-                text:"24/7 Help"
-              }
-
-            ].map((item,index)=>(
-
-
-              <div
-
-                key={index}
-
-                className="
-                  bg-white
-                  rounded-3xl
-                  shadow-md
-                  p-5
-                  text-center
-                  hover:shadow-xl
-                  transition
-                  border
-                  border-orange-200
-                "
-
-              >
-
-
-                <div className="
-                  text-4xl
-                ">
-
-                  {item.icon}
-
-                </div>
-
-
-
-                <h3 className="
-                  font-bold
-                  mt-3
-                ">
-
-                  {item.title}
-
-                </h3>
-
-
-
-                <p className="
-                  text-xs
-                  text-gray-500
-                  mt-1
-                ">
-
-                  {item.text}
-
-                </p>
-
-
-              </div>
-
-
-            ))}
-
-
-          </div>
-
-
-        </section>
+        <p className="text-[11px] sm:text-xs text-gray-500 mt-1">
+          {item.text}
+        </p>
+      </div>
+    ))}
+  </div>
+</section>
 
 
 
@@ -242,8 +191,7 @@ export default function Home() {
 
 
         <section className="
-          px-4
-          mt-10
+          px-3 sm:px-4 mt-8 sm:mt-10
         ">
 
 
@@ -253,7 +201,7 @@ export default function Home() {
             via-orange-500
             to-yellow-500
             rounded-[30px]
-            p-8
+            p-5 sm:p-8
             text-center
             text-white
             shadow-xl
@@ -262,7 +210,7 @@ export default function Home() {
 
 
             <h2 className="
-              text-3xl
+              text-2xl sm:text-3xl md:text-4xl
               font-extrabold
             ">
 
@@ -273,7 +221,7 @@ export default function Home() {
 
 
             <p className="
-              mt-3
+              mt-2 sm:mt-3 text-sm sm:text-base
               text-white/90
             ">
 
@@ -295,8 +243,7 @@ export default function Home() {
                 bg-white
                 text-orange-600
                 font-bold
-                px-8
-                py-3
+                px-6 sm:px-8 py-2.5 sm:py-3
                 rounded-2xl
                 hover:scale-105
                 transition
@@ -349,8 +296,7 @@ export default function Home() {
 
 
         <section className="
-          mt-10
-          px-4
+          mt-8 sm:mt-10 px-3 sm:px-4
         ">
 
 

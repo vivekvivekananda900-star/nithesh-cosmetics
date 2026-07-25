@@ -4,238 +4,102 @@ import { useState } from "react";
 import { supabase } from "@/app/lib/supabase";
 import { useRouter } from "next/navigation";
 
-
 export default function SignupPage() {
-
   const router = useRouter();
 
-
-  const [name,setName] = useState("");
-  const [email,setEmail] = useState("");
-  const [password,setPassword] = useState("");
-
-  const [loading,setLoading] = useState(false);
-
-
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   async function handleSignup(
-    e: React.FormEvent
+    e: React.FormEvent<HTMLFormElement>
   ) {
-
     e.preventDefault();
 
-
     try {
-
       setLoading(true);
 
-
-
-      // Create Supabase Auth User
-      const {
-        data,
-        error
-      } = await supabase.auth.signUp({
-
+      // Create Auth User
+      const { data, error } = await supabase.auth.signUp({
         email,
-
         password,
-
       });
 
+      if (error) throw error;
 
-
-      if(error) {
-
-        throw error;
-
+      if (!data.user) {
+        throw new Error("User not created");
       }
 
+      // Insert Profile
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .insert({
+          uuid: data.user.id,
+          name: name.trim(),
+          email: email.trim(),
+          role: "user",
+        });
 
+      if (profileError) throw profileError;
 
-      const user = data.user;
+      alert("✅ Account Created Successfully");
 
-
-
-      if(!user){
-
-        throw new Error(
-          "User creation failed"
-        );
-
-      }
-
-
-
-
-      // Create Profile
-      const {
-        error: profileError
-      } = await supabase
-      .from("profiles")
-      .insert({
-
-        id: user.id,
-
-        name,
-
-        email,
-
-        role: "user"
-
-      });
-
-
-
-      if(profileError){
-
-        throw profileError;
-
-      }
-
-
-
-
-      alert(
-        "Account created successfully!"
-      );
-
-
-      router.push("/profile");
-
-
-    }
-    catch(error:any){
-
-      alert(error.message);
-
-    }
-    finally{
-
+      router.push("/login");
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
       setLoading(false);
-
     }
-
   }
 
-
-
-
   return (
-
-    <main className="
-    min-h-screen
-    flex
-    items-center
-    justify-center
-    bg-gray-100
-    ">
-
-
+    <main className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
       <form
-      onSubmit={handleSignup}
-      className="
-      bg-white
-      p-8
-      rounded-xl
-      shadow-lg
-      w-96
-      "
+        onSubmit={handleSignup}
+        className="bg-white w-full max-w-md rounded-2xl shadow-xl p-8"
       >
-
-
-        <h1 className="
-        text-3xl
-        font-bold
-        text-center
-        mb-6
-        ">
+        <h1 className="text-3xl font-bold text-center mb-8">
           Create Account
         </h1>
 
-
-
         <input
-        placeholder="Name"
-        className="
-        w-full
-        border
-        p-3
-        rounded-lg
-        mb-4
-        "
-        value={name}
-        onChange={(e)=>
-          setName(e.target.value)
-        }
+          type="text"
+          placeholder="Full Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+          className="w-full border rounded-lg p-3 mb-4"
         />
 
-
-
         <input
-        type="email"
-        placeholder="Email"
-        className="
-        w-full
-        border
-        p-3
-        rounded-lg
-        mb-4
-        "
-        value={email}
-        onChange={(e)=>
-          setEmail(e.target.value)
-        }
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          className="w-full border rounded-lg p-3 mb-4"
         />
 
-
-
         <input
-        type="password"
-        placeholder="Password"
-        className="
-        w-full
-        border
-        p-3
-        rounded-lg
-        mb-4
-        "
-        value={password}
-        onChange={(e)=>
-          setPassword(e.target.value)
-        }
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          minLength={6}
+          className="w-full border rounded-lg p-3 mb-6"
         />
-
-
 
         <button
-        disabled={loading}
-        className="
-        w-full
-        bg-green-600
-        text-white
-        py-3
-        rounded-lg
-        "
+          type="submit"
+          disabled={loading}
+          className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-bold"
         >
-
-        {
-          loading
-          ?
-          "Creating..."
-          :
-          "Sign Up"
-        }
-
+          {loading ? "Creating..." : "Sign Up"}
         </button>
-
-
-
       </form>
-
-
     </main>
-
   );
-
 }

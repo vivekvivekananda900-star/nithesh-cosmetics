@@ -27,60 +27,61 @@ export default function Navbar() {
       <header className="sticky top-0 z-50 bg-orange-500 text-white shadow-lg">
 
         {/* Top Header */}
-        <div className="flex items-center justify-between px-4 py-4">
+        <div className="flex items-center justify-between px-3 sm:px-4 py-3 sm:py-4">
 
+          {/* Menu */}
           <button
             onClick={() => setDrawerOpen(true)}
-            className="p-2 rounded-full hover:bg-orange-600 transition"
+            className="p-2 rounded-full hover:bg-orange-600 transition shrink-0"
           >
-            <Menu size={26} />
+            <Menu size={22} className="sm:w-6 sm:h-6" />
           </button>
 
-          <div className="text-center">
-            <h1 className="text-xl font-extrabold">
+          {/* Logo & Title */}
+          <div className="flex-1 text-center px-2">
+            <h1 className="text-lg sm:text-2xl md:text-3xl font-black tracking-wide uppercase text-white drop-shadow-md">
               Nithesh Cosmetics
             </h1>
 
-            <p className="text-xs text-orange-100">
+            <p className="text-[11px] sm:text-xs text-orange-100 tracking-wider">
               Barber & Cosmetics Store
             </p>
           </div>
 
+          {/* Profile */}
           <Link
             href="/profile"
-            className="w-10 h-10 rounded-full bg-white text-orange-500 flex items-center justify-center"
+            className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white text-orange-500 flex items-center justify-center shrink-0"
           >
-            <User size={22} />
+            <User size={20} />
           </Link>
 
         </div>
 
         {/* Delivery Address */}
-        <div className="px-4 pb-3">
+        <div className="px-3 sm:px-4 pb-3">
 
-          <div className="bg-white rounded-2xl p-4 text-black">
+          <div className="bg-white rounded-2xl p-3 sm:p-4 text-black shadow">
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
 
               <MapPin
                 size={18}
-                className="text-orange-500"
+                className="text-orange-500 shrink-0"
               />
 
               <div>
-
-                <p className="text-xs text-gray-500">
+                <p className="text-[11px] sm:text-xs text-gray-500">
                   Deliver to
                 </p>
 
-                <h3 className="font-bold">
+                <h3 className="font-bold text-sm sm:text-base">
                   Nagarkurnool
                 </h3>
 
-                <p className="text-xs text-gray-500">
+                <p className="text-[11px] sm:text-xs text-gray-500">
                   Near VKR Hospital
                 </p>
-
               </div>
 
             </div>
@@ -94,19 +95,19 @@ export default function Navbar() {
       {/* Floating Action Icons */}
       <div className="sticky top-[120px] z-40 bg-white shadow-sm">
 
-        <div className="flex items-center justify-around py-3">
+        <div className="flex items-center justify-around py-2.5 sm:py-3">
 
           <Link href="/wishlist">
             <Heart
-              size={24}
-              className="text-gray-700"
+              size={22}
+              className="text-gray-700 hover:text-orange-500 transition"
             />
           </Link>
 
           <Link href="/notifications">
             <Bell
-              size={24}
-              className="text-gray-700"
+              size={22}
+              className="text-gray-700 hover:text-orange-500 transition"
             />
           </Link>
 
@@ -115,12 +116,12 @@ export default function Navbar() {
             className="relative"
           >
             <ShoppingCart
-              size={24}
-              className="text-gray-700"
+              size={22}
+              className="text-gray-700 hover:text-orange-500 transition"
             />
 
             {cartCount > 0 && (
-              <span className="absolute -top-2 -right-2 bg-red-600 text-white text-[10px] rounded-full w-5 h-5 flex items-center justify-center">
+              <span className="absolute -top-1.5 -right-1.5 bg-red-600 text-white text-[10px] rounded-full min-w-[18px] h-[18px] px-1 flex items-center justify-center">
                 {cartCount}
               </span>
             )}

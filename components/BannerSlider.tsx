@@ -39,7 +39,7 @@ export default function BannerSlider() {
   if (banners.length === 0) return null;
 
   return (
-    <div className="px-4 mt-4">
+    <div className="px-3 sm:px-4 mt-4">
       <Swiper
         modules={[Autoplay, Pagination]}
         autoplay={{
@@ -52,32 +52,34 @@ export default function BannerSlider() {
       >
         {banners.map((banner) => (
           <SwiperSlide key={banner.id}>
-            <div className="relative overflow-hidden rounded-3xl shadow-xl">
+            <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl shadow-xl">
 
               <img
                 src={banner.image}
                 alt={banner.title}
-                className="w-full h-56 object-cover"
+                className="w-full h-48 sm:h-64 md:h-80 lg:h-[420px] object-cover"
               />
 
-              <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/20" />
+              <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
 
-              <div className="absolute left-0 right-0 bottom-0 p-6 text-white">
-                <p className="text-sm font-medium text-orange-300">
+              <div className="absolute inset-0 flex flex-col justify-end p-4 sm:p-6 md:p-8 text-white">
+
+                <p className="text-xs sm:text-sm font-semibold text-orange-300 tracking-wider uppercase">
                   Nithesh Cosmetics
                 </p>
 
-                <h2 className="text-3xl font-bold mt-2">
+                <h2 className="mt-2 text-xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight">
                   {banner.title}
                 </h2>
 
-                <p className="mt-2 text-white/90">
+                <p className="mt-2 text-sm sm:text-base text-white/90 max-w-md">
                   {banner.subtitle}
                 </p>
 
-                <button className="mt-5 bg-orange-500 hover:bg-orange-600 transition px-6 py-3 rounded-xl font-semibold">
-                  Shop Now
+                <button className="mt-4 sm:mt-5 w-fit bg-orange-500 hover:bg-orange-600 transition px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl font-semibold shadow-lg">
+                  Shop Now →
                 </button>
+
               </div>
 
             </div>
