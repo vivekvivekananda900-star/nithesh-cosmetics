@@ -63,21 +63,25 @@ export default function ProductSection() {
 
     setProducts(formattedProducts);
   }
-
   async function handleWishlist(
     e: React.MouseEvent,
     productId: string
   ) {
     e.preventDefault();
 
-    const state = await toggleWishlist(productId);
+    const result = await toggleWishlist(productId);
+
+    if (!result.success) {
+      alert(result.message || "Please login first");
+      return;
+    }
 
     setProducts((prev) =>
       prev.map((item) =>
         item.id === productId
           ? {
               ...item,
-              wishlisted: state,
+              wishlisted: result.action === "added",
             }
           : item
       )
@@ -103,8 +107,7 @@ export default function ProductSection() {
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-
-        {products.map((product) => (
+       {products.map((product) => (
 
           <div
             key={product.id}
@@ -145,40 +148,44 @@ export default function ProductSection() {
 
               </div>
 
-              <div className="p-4">
+            </Link>
+
+            <div className="p-4">
+
+              <Link href={`/products/${product.id}`}>
 
                 <h3 className="font-bold line-clamp-2">
                   {product.name}
                 </h3>
 
-                <div className="flex items-center mt-2">
+              </Link>
 
-                  <Star
-                    size={15}
-                    className="fill-yellow-400 text-yellow-400"
-                  />
+              <div className="flex items-center mt-2">
 
-                  <span className="ml-1 text-sm">
-                    4.8
-                  </span>
+                <Star
+                  size={15}
+                  className="fill-yellow-400 text-yellow-400"
+                />
 
-                </div>
-
-                <p className="text-green-600 text-xl font-bold mt-3">
-                  ₹{product.price}
-                </p>
+                <span className="ml-1 text-sm">
+                  4.8
+                </span>
 
               </div>
 
-            </Link>
+              <p className="text-green-600 text-xl font-bold mt-3">
+                ₹{product.price}
+              </p>
 
-            <button
-              onClick={() => addToCart(product)}
-              className="m-4 w-[calc(100%-32px)] bg-yellow-500 hover:bg-yellow-600 text-white py-3 rounded-xl flex items-center justify-center gap-2"
-            >
-              <ShoppingCart size={18} />
-              Add To Cart
-            </button>
+              <button
+                onClick={() => addToCart(product)}
+                className="mt-4 w-full bg-yellow-500 hover:bg-yellow-600 text-white py-3 rounded-xl flex items-center justify-center gap-2"
+              >
+                <ShoppingCart size={18} />
+                Add To Cart
+              </button>
+
+            </div>
 
           </div>
 
@@ -188,4 +195,4 @@ export default function ProductSection() {
 
     </section>
   );
-}
+} 
