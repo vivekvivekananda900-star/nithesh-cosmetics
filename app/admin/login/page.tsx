@@ -2,13 +2,9 @@
 
 import { useState } from "react";
 import { supabase } from "@/app/lib/supabase";
-import { useRouter } from "next/navigation";
 
 
 export default function AdminLoginPage() {
-
-  const router = useRouter();
-
 
   const [email, setEmail] = useState("");
 
@@ -61,7 +57,6 @@ export default function AdminLoginPage() {
 
 
 
-
       const {
         data: profile,
         error: profileError
@@ -87,14 +82,13 @@ export default function AdminLoginPage() {
 
 
 
-
       if (profile?.role === "admin") {
 
 
         alert("✅ Admin Login Successful");
 
 
-        router.push("/admin");
+        window.location.href = "/admin";
 
 
       }
@@ -131,7 +125,6 @@ export default function AdminLoginPage() {
 
 
     }
-
 
   }
 
@@ -207,7 +200,6 @@ export default function AdminLoginPage() {
 
 
 
-
         <input
 
           type="password"
@@ -229,7 +221,6 @@ export default function AdminLoginPage() {
           "
 
         />
-
 
 
 
@@ -259,9 +250,7 @@ export default function AdminLoginPage() {
             : "Login as Admin"
           }
 
-
         </button>
-
 
 
       </form>
