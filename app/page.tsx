@@ -5,7 +5,6 @@ import CategorySection from "@/components/CategorySection";
 import ProductSection from "@/components/ProductSection";
 import NewArrivals from "@/components/NewArrivals";
 import LocationCard from "@/components/LocationCard";
-import BottomNavigation from "@/components/BottomNavigation";
 import Link from "next/link";
 
 
@@ -317,7 +316,7 @@ export default function Home() {
 
 
 
-      <BottomNavigation />
+     
 
 
     </>
