@@ -1,17 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
-import {
-  collection,
-  getDocs,
-  addDoc,
-  deleteDoc,
-  doc,
-  getDoc,
-} from "firebase/firestore";
-
-import { db } from "@/app/lib/firebase";
+import { supabase } from "@/app/lib/supabase";
+import { useRouter } from "next/navigation";
 
 
 interface Product {
@@ -31,7 +22,7 @@ interface Arrival {
 
   id:string;
 
-  productId:string;
+  product_id:string;
 
   product?:Product;
 
@@ -39,15 +30,23 @@ interface Arrival {
 
 
 
+
+
 export default function NewArrivalsAdmin(){
+
+
+const router = useRouter();
+
 
 
 const [products,setProducts] =
 useState<Product[]>([]);
 
 
+
 const [arrivals,setArrivals] =
 useState<Arrival[]>([]);
+
 
 
 const [selectedProduct,setSelectedProduct] =
@@ -55,102 +54,9 @@ useState("");
 
 
 
+const [loading,setLoading] =
+useState(true);
 
-
-const loadProducts = async()=>{
-
-
-const snapshot =
-await getDocs(
-collection(db,"products")
-);
-
-
-setProducts(
-
-snapshot.docs.map((item)=>({
-
-id:item.id,
-
-...(item.data() as Omit<Product,"id">)
-
-}))
-
-);
-
-
-};
-
-
-
-
-
-
-const loadArrivals = async()=>{
-
-
-const snapshot =
-await getDocs(
-collection(db,"newArrivals")
-);
-
-
-
-const list:Arrival[]=[];
-
-
-
-for(const item of snapshot.docs){
-
-
-const data=item.data();
-
-
-
-const productSnap =
-await getDoc(
-
-doc(
-db,
-"products",
-data.productId
-)
-
-);
-
-
-
-if(productSnap.exists()){
-
-
-list.push({
-
-id:item.id,
-
-productId:data.productId,
-
-product:{
-
-id:productSnap.id,
-
-...(productSnap.data() as Omit<Product,"id">)
-
-}
-
-});
-
-
-}
-
-
-}
-
-
-
-setArrivals(list);
-
-
-};
 
 
 
@@ -159,9 +65,7 @@ setArrivals(list);
 
 useEffect(()=>{
 
-loadProducts();
-
-loadArrivals();
+checkAdmin();
 
 },[]);
 
@@ -171,27 +75,236 @@ loadArrivals();
 
 
 
-const addArrival = async()=>{
 
 
-if(!selectedProduct)
+async function checkAdmin(){
+
+
+const {
+ data:{
+  user
+ }
+}=await supabase.auth.getUser();
+
+
+
+
+if(!user){
+
+router.push("/login");
+
 return;
-
-
-
-await addDoc(
-
-collection(db,"newArrivals"),
-
-{
-
-productId:selectedProduct,
-
-active:true
 
 }
 
+
+
+
+const {data:profile}=await supabase
+
+.from("profiles")
+
+.select("role")
+
+.eq("id",user.id)
+
+.single();
+
+
+
+
+
+if(profile?.role !== "admin"){
+
+router.push("/");
+
+return;
+
+}
+
+
+
+loadProducts();
+
+loadArrivals();
+
+
+}
+
+
+
+
+
+
+
+
+
+
+async function loadProducts(){
+
+
+
+const {
+data,
+error
+}=await supabase
+
+.from("products")
+
+.select("*");
+
+
+
+
+
+if(error){
+
+console.log(error);
+
+return;
+
+}
+
+
+
+
+setProducts(data || []);
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+async function loadArrivals(){
+
+
+
+const {
+data,
+error
+}=await supabase
+
+.from("new_arrivals")
+
+.select(`
+id,
+product_id,
+products(
+id,
+name,
+image,
+price
+)
+`)
+
+.order(
+"created_at",
+{
+ascending:false
+}
 );
+
+
+
+
+
+if(error){
+
+console.log(error);
+
+return;
+
+}
+
+
+
+
+const formatted =
+data?.map((item:any)=>({
+
+id:item.id,
+
+product_id:item.product_id,
+
+product:item.products
+
+
+})) || [];
+
+
+
+
+
+setArrivals(formatted);
+
+
+
+setLoading(false);
+
+
+}
+
+
+
+
+
+
+
+
+
+async function addArrival(){
+
+
+
+if(!selectedProduct){
+
+alert("Select product");
+
+return;
+
+}
+
+
+
+
+
+const {
+error
+}=await supabase
+
+.from("new_arrivals")
+
+.insert({
+
+product_id:selectedProduct,
+
+active:true
+
+});
+
+
+
+
+
+
+if(error){
+
+alert(error.message);
+
+return;
+
+}
+
+
 
 
 
@@ -200,7 +313,8 @@ setSelectedProduct("");
 loadArrivals();
 
 
-};
+
+}
 
 
 
@@ -208,25 +322,59 @@ loadArrivals();
 
 
 
-const deleteArrival = async(id:string)=>{
 
 
-await deleteDoc(
+async function deleteArrival(
+id:string
+){
 
-doc(
-db,
-"newArrivals",
+
+
+await supabase
+
+.from("new_arrivals")
+
+.delete()
+
+.eq(
+"id",
 id
-)
-
 );
+
 
 
 
 loadArrivals();
 
 
-};
+}
+
+
+
+
+
+
+
+
+if(loading){
+
+return(
+
+<div className="
+min-h-screen
+flex
+items-center
+justify-center
+font-bold
+">
+
+Loading...
+
+</div>
+
+);
+
+}
 
 
 
@@ -245,6 +393,7 @@ dark:bg-gray-950
 p-6
 "
 >
+
 
 
 <h1
@@ -266,6 +415,7 @@ dark:text-white
 
 
 
+
 <div
 className="
 bg-white
@@ -278,11 +428,14 @@ max-w-xl
 >
 
 
+
 <select
 
 value={selectedProduct}
 
-onChange={(e)=>setSelectedProduct(e.target.value)}
+onChange={(e)=>
+setSelectedProduct(e.target.value)
+}
 
 className="
 w-full
@@ -302,8 +455,8 @@ Select Product
 
 
 {
-
 products.map((product)=>(
+
 
 <option
 
@@ -317,12 +470,14 @@ value={product.id}
 
 </option>
 
+
 ))
 
 }
 
 
 </select>
+
 
 
 
@@ -349,7 +504,9 @@ font-bold
 </button>
 
 
+
 </div>
+
 
 
 
@@ -373,6 +530,7 @@ gap-5
 arrivals.map((item)=>(
 
 
+
 <div
 
 key={item.id}
@@ -386,6 +544,7 @@ overflow-hidden
 "
 
 >
+
 
 
 <img
@@ -408,6 +567,7 @@ bg-gray-100
 
 
 
+
 <div className="p-4">
 
 
@@ -419,6 +579,8 @@ dark:text-white
 {item.product?.name}
 
 </h2>
+
+
 
 
 
@@ -436,9 +598,12 @@ mt-2
 
 
 
+
 <button
 
-onClick={()=>deleteArrival(item.id)}
+onClick={()=>
+deleteArrival(item.id)
+}
 
 className="
 mt-4
@@ -457,10 +622,14 @@ Remove
 </button>
 
 
+
 </div>
 
 
+
+
 </div>
+
 
 
 ))
@@ -468,12 +637,15 @@ Remove
 }
 
 
+
 </div>
 
 
 
 
+
 </main>
+
 
 );
 

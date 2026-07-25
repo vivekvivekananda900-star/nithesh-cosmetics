@@ -1,155 +1,381 @@
 import Navbar from "@/components/Navbar";
 import BannerSlider from "@/components/BannerSlider";
+import SearchBar from "@/components/SearchBar";
 import CategorySection from "@/components/CategorySection";
 import ProductSection from "@/components/ProductSection";
-import BottomNavigation from "@/components/BottomNavigation";
 import NewArrivals from "@/components/NewArrivals";
 import LocationCard from "@/components/LocationCard";
+import BottomNavigation from "@/components/BottomNavigation";
 import Link from "next/link";
-import SearchBar from "@/components/SearchBar";
 
-<SearchBar />
 
 export default function Home() {
+
   return (
+
     <>
+
       <Navbar />
 
-      <main className="min-h-screen bg-gray-50 pb-24">
 
-        {/* Welcome Card */}
-        <section className="px-4 pt-4">
-          <div className="rounded-3xl bg-gradient-to-r from-yellow-500 to-orange-500 text-white p-6 shadow-xl">
-            <h1 className="text-3xl font-bold">
-              Welcome 👋
-            </h1>
+      <main className="
+        min-h-screen
+        bg-gradient-to-b
+        from-orange-50
+        via-orange-100
+        to-white
+        pb-24
+      ">
 
-            <p className="mt-2 text-white/90">
-              Discover premium barber tools, cosmetics,
-              grooming essentials and exclusive offers.
-            </p>
+
+
+        {/* Search */}
+
+        <section className="
+          px-4
+          pt-5
+        ">
+
+          <div className="
+            bg-white
+            rounded-3xl
+            shadow-lg
+            p-2
+          ">
+
+            <SearchBar />
+
           </div>
+
         </section>
+
+
+
+
+
+
+
 
         {/* Banner */}
-        <BannerSlider />
+
+        <section className="
+          mt-5
+          px-4
+        ">
+
+          <div className="
+            rounded-3xl
+            overflow-hidden
+            shadow-xl
+          ">
+
+            <BannerSlider />
+
+          </div>
+
+
+        </section>
+
+
+
+
+
+
+
+
+
+        {/* Premium Services */}
+
+
+        <section className="
+          px-4
+          mt-8
+        ">
+
+
+          <div className="
+            grid
+            grid-cols-2
+            md:grid-cols-4
+            gap-4
+          ">
+
+
+
+            {[
+              {
+                icon:"🚚",
+                title:"Free Delivery",
+                text:"Fast Shipping"
+              },
+
+              {
+                icon:"🔒",
+                title:"Secure Payment",
+                text:"Safe Checkout"
+              },
+
+              {
+                icon:"⭐",
+                title:"Premium",
+                text:"Quality Products"
+              },
+
+              {
+                icon:"📞",
+                title:"Support",
+                text:"24/7 Help"
+              }
+
+            ].map((item,index)=>(
+
+
+              <div
+
+                key={index}
+
+                className="
+                  bg-white
+                  rounded-3xl
+                  shadow-md
+                  p-5
+                  text-center
+                  hover:shadow-xl
+                  transition
+                  border
+                  border-orange-200
+                "
+
+              >
+
+
+                <div className="
+                  text-4xl
+                ">
+
+                  {item.icon}
+
+                </div>
+
+
+
+                <h3 className="
+                  font-bold
+                  mt-3
+                ">
+
+                  {item.title}
+
+                </h3>
+
+
+
+                <p className="
+                  text-xs
+                  text-gray-500
+                  mt-1
+                ">
+
+                  {item.text}
+
+                </p>
+
+
+              </div>
+
+
+            ))}
+
+
+          </div>
+
+
+        </section>
+
+
+
+
+
+
+
+
 
         {/* Categories */}
-        <CategorySection />
 
-        {/* Offer Banner */}
-        <section className="px-4 mt-8">
-          <div className="rounded-3xl bg-green-600 text-white p-6 flex items-center justify-between">
-            <div>
-              <p className="text-sm">
-                Limited Time
-              </p>
 
-              <h2 className="text-2xl font-bold">
-                30% OFF
-              </h2>
+        <section className="
+          mt-10
+        ">
 
-              <p className="text-sm mt-1">
-                On selected products
-              </p>
-            </div>
+          <CategorySection />
 
-            <div className="text-6xl">
-              🎁
-            </div>
-          </div>
         </section>
+
+
+
+
+
+
+
+
 
         {/* Products */}
-        <ProductSection />
 
-        {/* Why Choose Us */}
-        <section className="px-4 mt-10">
-          <h2 className="text-2xl font-bold mb-4">
-            Why Choose Us?
-          </h2>
 
-          <div className="grid grid-cols-2 gap-4">
+        <section className="
+          mt-10
+        ">
 
-            <div className="bg-white rounded-2xl p-5 shadow">
-              <div className="text-4xl">🚚</div>
+          <ProductSection />
 
-              <h3 className="font-semibold mt-2">
-                Fast Delivery
-              </h3>
-
-              <p className="text-sm text-gray-500">
-                Quick and reliable shipping.
-              </p>
-            </div>
-
-            <div className="bg-white rounded-2xl p-5 shadow">
-              <div className="text-4xl">💯</div>
-
-              <h3 className="font-semibold mt-2">
-                Original Products
-              </h3>
-
-              <p className="text-sm text-gray-500">
-                100% genuine quality.
-              </p>
-            </div>
-
-            <div className="bg-white rounded-2xl p-5 shadow">
-              <div className="text-4xl">💳</div>
-
-              <h3 className="font-semibold mt-2">
-                Secure Payment
-              </h3>
-
-              <p className="text-sm text-gray-500">
-                Safe and trusted checkout.
-              </p>
-            </div>
-
-            <div className="bg-white rounded-2xl p-5 shadow">
-              <div className="text-4xl">📞</div>
-
-              <h3 className="font-semibold mt-2">
-                Customer Support
-              </h3>
-
-              <p className="text-sm text-gray-500">
-                Friendly support anytime.
-              </p>
-            </div>
-
-          </div>
         </section>
-        {/* Explore */}
-        <section className="px-4 mt-10">
-          <div className="bg-white rounded-3xl shadow p-6 text-center">
-            <h2 className="text-2xl font-bold">
-              Explore More Products
+
+
+
+
+
+
+
+
+
+        {/* Explore More */}
+
+
+        <section className="
+          px-4
+          mt-10
+        ">
+
+
+          <div className="
+            bg-gradient-to-r
+            from-orange-600
+            via-orange-500
+            to-yellow-500
+            rounded-[30px]
+            p-8
+            text-center
+            text-white
+            shadow-xl
+          ">
+
+
+
+            <h2 className="
+              text-3xl
+              font-extrabold
+            ">
+
+              Premium Beauty Collection
+
             </h2>
 
-            <p className="text-gray-500 mt-2">
-              Browse our complete collection.
+
+
+            <p className="
+              mt-3
+              text-white/90
+            ">
+
+              Discover professional barber tools,
+              cosmetics and accessories.
+
             </p>
 
+
+
+
             <Link
+
               href="/products"
-              className="inline-block mt-5 bg-orange-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-orange-600 transition"
+
+              className="
+                inline-block
+                mt-6
+                bg-white
+                text-orange-600
+                font-bold
+                px-8
+                py-3
+                rounded-2xl
+                hover:scale-105
+                transition
+              "
+
             >
-              View All Products
+
+              Shop Now →
+
             </Link>
+
+
+
           </div>
+
+
+
         </section>
 
-        {/* New Arrivals */}
-        <NewArrivals />
 
-        {/* Store Location */}
-        <LocationCard />
+
+
+
+
+
+
+
+        {/* New Arrivals */}
+
+
+        <section className="
+          mt-10
+        ">
+
+
+          <NewArrivals />
+
+
+        </section>
+
+
+
+
+
+
+
+
+
+        {/* Location */}
+
+
+        <section className="
+          mt-10
+          px-4
+        ">
+
+
+          <LocationCard />
+
+
+        </section>
+
+
+
+
+
+
 
       </main>
 
+
+
+
+
       <BottomNavigation />
+
+
     </>
+
   );
+
 }

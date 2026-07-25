@@ -45,7 +45,6 @@ export default function AdminGuard({
   },[router]);
 
 
-
   if(loading){
 
     return (

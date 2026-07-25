@@ -75,7 +75,8 @@ export default function Footer() {
       <div className="border-t border-gray-700 text-center py-4 text-gray-400">
 
         © {new Date().getFullYear()} 
-        Nithesh Cosmetics. vivek All rights reserved.
+        Nithesh Cosmetics. vivek 
+        All rights reserved.
 
       </div>
 

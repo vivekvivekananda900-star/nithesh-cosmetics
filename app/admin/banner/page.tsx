@@ -1,42 +1,84 @@
 "use client";
 
-import { useState, useEffect } from "react";
-
-import {
-  collection,
-  addDoc,
-  getDocs,
-  deleteDoc,
-  doc,
-  updateDoc,
-} from "firebase/firestore";
-
-import { db } from "@/app/lib/firebase";
-
+import { useEffect, useState } from "react";
+import { supabase } from "@/app/lib/supabase";
+import { useRouter } from "next/navigation";
 
 
 export default function BannerAdminPage() {
+
+
+  const router = useRouter();
 
 
   const [banners,setBanners] = useState<any[]>([]);
 
 
   const [title,setTitle] = useState("");
-
   const [subtitle,setSubtitle] = useState("");
-
   const [image,setImage] = useState("");
 
-  const [editId,setEditId] = useState("");
-
+  const [loading,setLoading] = useState(true);
 
 
 
   useEffect(()=>{
 
-    loadBanners();
+    checkAdmin();
 
   },[]);
+
+
+
+
+
+  async function checkAdmin(){
+
+
+    const {
+      data:{
+        user
+      }
+    } = await supabase.auth.getUser();
+
+
+
+    if(!user){
+
+      router.push("/login");
+
+      return;
+
+    }
+
+
+
+
+    const {data:profile}=await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id",user.id)
+    .single();
+
+
+
+
+    if(profile?.role !== "admin"){
+
+      router.push("/");
+
+      return;
+
+    }
+
+
+
+    loadBanners();
+
+
+  }
+
+
 
 
 
@@ -46,25 +88,37 @@ export default function BannerAdminPage() {
   async function loadBanners(){
 
 
-    const snapshot = await getDocs(
-      collection(db,"banners")
+    const {
+      data,
+      error
+    } = await supabase
+    .from("banners")
+    .select("*")
+    .order(
+      "created_at",
+      {
+        ascending:false
+      }
     );
 
 
-    setBanners(
 
-      snapshot.docs.map((item)=>({
+    if(error){
 
-        id:item.id,
+      console.log(error);
 
-        ...item.data()
+      return;
 
-      }))
+    }
 
-    );
 
+    setBanners(data || []);
+
+
+    setLoading(false);
 
   }
+
 
 
 
@@ -85,23 +139,30 @@ export default function BannerAdminPage() {
 
 
 
-    await addDoc(
+    const {
+      error
+    } = await supabase
+    .from("banners")
+    .insert({
 
-      collection(db,"banners"),
+      title,
 
-      {
+      subtitle,
 
-        title,
+      image
 
-        subtitle,
+    });
 
-        image,
 
-        createdAt:new Date()
 
-      }
 
-    );
+    if(error){
+
+      alert(error.message);
+
+      return;
+
+    }
 
 
 
@@ -125,17 +186,19 @@ export default function BannerAdminPage() {
 
 
 
-  async function deleteBanner(id:string){
 
 
-    await deleteDoc(
+  async function deleteBanner(
+    id:string
+  ){
 
-      doc(
-        db,
-        "banners",
-        id
-      )
 
+    await supabase
+    .from("banners")
+    .delete()
+    .eq(
+      "id",
+      id
     );
 
 
@@ -151,27 +214,30 @@ export default function BannerAdminPage() {
 
 
 
-  async function editBanner(id:string){
+  async function editBanner(
+    banner:any
+  ){
 
 
     const newTitle =
-      prompt(
-        "Enter new banner title"
-      );
-
+    prompt(
+      "Enter new title",
+      banner.title
+    );
 
 
     const newSubtitle =
-      prompt(
-        "Enter new banner subtitle"
-      );
-
+    prompt(
+      "Enter new subtitle",
+      banner.subtitle
+    );
 
 
     const newImage =
-      prompt(
-        "Enter new image URL"
-      );
+    prompt(
+      "Enter new image URL",
+      banner.image
+    );
 
 
 
@@ -187,24 +253,22 @@ export default function BannerAdminPage() {
 
 
 
-    await updateDoc(
 
-      doc(
-        db,
-        "banners",
-        id
-      ),
 
-      {
+    await supabase
+    .from("banners")
+    .update({
 
-        title:newTitle,
+      title:newTitle,
 
-        subtitle:newSubtitle,
+      subtitle:newSubtitle,
 
-        image:newImage
+      image:newImage
 
-      }
-
+    })
+    .eq(
+      "id",
+      banner.id
     );
 
 
@@ -219,25 +283,47 @@ export default function BannerAdminPage() {
 
 
 
+  if(loading){
+
+    return(
+
+      <div className="
+      min-h-screen
+      flex
+      items-center
+      justify-center
+      font-bold
+      ">
+
+        Loading...
+
+      </div>
+
+    );
+
+  }
+
+
+
+
 
 
 
   return (
 
     <main className="
-      min-h-screen
-      bg-gray-100
-      dark:bg-gray-950
-      p-6
+    min-h-screen
+    bg-gray-100
+    dark:bg-gray-950
+    p-6
     ">
 
 
-
       <h1 className="
-        text-3xl
-        font-bold
-        mb-8
-        dark:text-white
+      text-3xl
+      font-bold
+      mb-8
+      dark:text-white
       ">
 
         🎞️ Banner Management
@@ -248,115 +334,76 @@ export default function BannerAdminPage() {
 
 
 
-
-      {/* Add Banner */}
-
       <div className="
-        bg-white
-        dark:bg-gray-900
-        p-6
-        rounded-xl
-        shadow
-        max-w-xl
+      bg-white
+      dark:bg-gray-900
+      p-6
+      rounded-xl
+      shadow
+      max-w-xl
       ">
 
 
-
         <input
-
-          placeholder="Banner Title"
-
-          value={title}
-
-          onChange={(e)=>
-            setTitle(e.target.value)
-          }
-
-          className="
-            w-full
-            border
-            p-3
-            rounded
-            mb-3
-          "
-
+        placeholder="Banner Title"
+        value={title}
+        onChange={(e)=>setTitle(e.target.value)}
+        className="
+        w-full
+        border
+        p-3
+        rounded
+        mb-3
+        "
         />
 
 
 
-
-
         <input
-
-          placeholder="Banner Subtitle"
-
-          value={subtitle}
-
-          onChange={(e)=>
-            setSubtitle(e.target.value)
-          }
-
-          className="
-            w-full
-            border
-            p-3
-            rounded
-            mb-3
-          "
-
+        placeholder="Banner Subtitle"
+        value={subtitle}
+        onChange={(e)=>setSubtitle(e.target.value)}
+        className="
+        w-full
+        border
+        p-3
+        rounded
+        mb-3
+        "
         />
 
 
 
-
-
-
         <input
-
-          placeholder="Image URL"
-
-          value={image}
-
-          onChange={(e)=>
-            setImage(e.target.value)
-          }
-
-          className="
-            w-full
-            border
-            p-3
-            rounded
-            mb-3
-          "
-
+        placeholder="Image URL"
+        value={image}
+        onChange={(e)=>setImage(e.target.value)}
+        className="
+        w-full
+        border
+        p-3
+        rounded
+        mb-3
+        "
         />
-
-
-
-
 
 
 
         <button
-
-          onClick={addBanner}
-
-          className="
-            bg-green-600
-            hover:bg-green-700
-            text-white
-            px-6
-            py-3
-            rounded-xl
-            font-bold
-          "
-
+        onClick={addBanner}
+        className="
+        bg-green-600
+        text-white
+        px-6
+        py-3
+        rounded-xl
+        font-bold
+        "
         >
 
           ➕ Add Banner
 
         </button>
-
 
 
       </div>
@@ -367,16 +414,11 @@ export default function BannerAdminPage() {
 
 
 
-
-
-      {/* Banner List */}
-
-
       <div className="
-        mt-10
-        grid
-        md:grid-cols-3
-        gap-5
+      mt-10
+      grid
+      md:grid-cols-3
+      gap-5
       ">
 
 
@@ -385,50 +427,36 @@ export default function BannerAdminPage() {
 
 
           <div
-
-            key={banner.id}
-
-            className="
-              bg-white
-              dark:bg-gray-900
-              rounded-xl
-              shadow
-              overflow-hidden
-            "
-
+          key={banner.id}
+          className="
+          bg-white
+          dark:bg-gray-900
+          rounded-xl
+          shadow
+          overflow-hidden
+          "
           >
 
 
-
-
             <img
-
-              src={banner.image}
-
-              alt={banner.title}
-
-              className="
-                w-full
-                h-40
-                object-cover
-              "
-
+            src={banner.image}
+            alt={banner.title}
+            className="
+            w-full
+            h-40
+            object-cover
+            "
             />
-
-
-
-
 
 
 
             <div className="p-4">
 
 
-
               <h2 className="
-                font-bold
-                text-xl
-                dark:text-white
+              font-bold
+              text-xl
+              dark:text-white
               ">
 
                 {banner.title}
@@ -437,12 +465,7 @@ export default function BannerAdminPage() {
 
 
 
-
-
-              <p className="
-                text-gray-500
-                mt-2
-              ">
+              <p className="text-gray-500 mt-2">
 
                 {banner.subtitle}
 
@@ -450,71 +473,46 @@ export default function BannerAdminPage() {
 
 
 
-
-
-
-
               <div className="flex gap-3 mt-4">
 
 
-
-              <button
-
-                onClick={()=>
-                  editBanner(banner.id)
-                }
-
+                <button
+                onClick={()=>editBanner(banner)}
                 className="
-                  bg-blue-600
-                  text-white
-                  px-4
-                  py-2
-                  rounded-lg
+                bg-blue-600
+                text-white
+                px-4
+                py-2
+                rounded-lg
                 "
+                >
 
-              >
+                  ✏️ Edit
 
-                ✏️ Edit
-
-              </button>
-
+                </button>
 
 
 
-
-
-
-              <button
-
-                onClick={()=>
-                  deleteBanner(banner.id)
-                }
-
+                <button
+                onClick={()=>deleteBanner(banner.id)}
                 className="
-                  bg-red-600
-                  text-white
-                  px-4
-                  py-2
-                  rounded-lg
+                bg-red-600
+                text-white
+                px-4
+                py-2
+                rounded-lg
                 "
+                >
 
-              >
+                  🗑 Delete
 
-                🗑 Delete
-
-              </button>
-
+                </button>
 
 
               </div>
 
 
-
-
-
             </div>
-
-
 
 
           </div>
@@ -524,16 +522,11 @@ export default function BannerAdminPage() {
       }
 
 
-
       </div>
-
-
-
 
 
     </main>
 
   );
-
 
 }

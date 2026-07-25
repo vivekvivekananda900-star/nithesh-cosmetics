@@ -1,14 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  collection,
-  getDocs,
-  doc,
-  updateDoc,
-} from "firebase/firestore";
-
-import { db } from "@/app/lib/firebase";
+import { supabase } from "@/app/lib/supabase";
+import { useRouter } from "next/navigation";
 
 
 interface Product {
@@ -28,199 +22,305 @@ interface Product {
 export default function StockManagementPage(){
 
 
-  const [products,setProducts] =
-    useState<Product[]>([]);
+const router = useRouter();
 
 
-  const [loading,setLoading] =
-    useState(true);
+const [products,setProducts] =
+useState<Product[]>([]);
 
 
+const [loading,setLoading] =
+useState(true);
 
-  const [stockValues,setStockValues] =
-    useState<{[key:string]:number}>({});
 
 
+const [stockValues,setStockValues] =
+useState<{[key:string]:number}>({});
 
 
-  useEffect(()=>{
 
-    fetchProducts();
 
-  },[]);
 
 
 
+useEffect(()=>{
 
+checkAdmin();
 
-  async function fetchProducts(){
+},[]);
 
 
-    try{
 
 
-      const snapshot =
-        await getDocs(
-          collection(db,"products")
-        );
 
 
 
-      const list =
-        snapshot.docs.map((item)=>{
+async function checkAdmin(){
 
 
-          const data=item.data();
+const {
+data:{
+user
+}
+}=await supabase.auth.getUser();
 
 
-          return {
 
-            id:item.id,
 
-            name:data.name || "",
 
-            image:data.image || "",
+if(!user){
 
-            stock:Number(data.stock) || 0,
+router.push("/login");
 
-          };
+return;
 
+}
 
-        });
 
 
 
-      setProducts(list);
 
+const {data:profile}=await supabase
 
+.from("profiles")
 
-      const stocks:any={};
+.select("role")
 
+.eq("id",user.id)
 
-      list.forEach((item)=>{
+.single();
 
-        stocks[item.id]=item.stock;
 
-      });
 
 
 
-      setStockValues(stocks);
+if(profile?.role !== "admin"){
 
+router.push("/");
 
+return;
 
-    }
-    catch(error){
+}
 
-      console.log(error);
 
-    }
-    finally{
 
-      setLoading(false);
 
-    }
+fetchProducts();
 
 
-  }
+}
 
 
 
 
 
-  async function updateStock(id:string){
 
 
-    try{
 
 
-      const productRef =
-        doc(
-          db,
-          "products",
-          id
-        );
+async function fetchProducts(){
 
 
+try{
 
-      await updateDoc(
-        productRef,
-        {
-          stock:
-          Number(stockValues[id])
-        }
-      );
 
+const {
+data,
+error
+}=await supabase
 
+.from("products")
 
-      alert(
-        "Stock Updated Successfully ✅"
-      );
+.select(
+"id,name,image,stock"
+);
 
 
-    }
-    catch(error){
 
-      console.log(error);
 
-      alert(
-        "Update failed"
-      );
 
-    }
+if(error){
 
+throw error;
 
-  }
+}
 
 
 
 
 
+setProducts(data || []);
 
-  if(loading){
 
 
-    return (
 
-      <div className="
-        h-screen
-        flex
-        items-center
-        justify-center
-        text-xl
-        font-bold
-      ">
 
-        Loading Stock...
+const stocks:any = {};
 
-      </div>
 
-    );
 
+data?.forEach((item)=>{
 
-  }
+stocks[item.id] =
+item.stock || 0;
 
+});
 
 
 
 
-return (
+setStockValues(stocks);
+
+
+
+}
+catch(error){
+
+console.log(error);
+
+}
+finally{
+
+setLoading(false);
+
+}
+
+
+
+}
+
+
+
+
+
+
+
+
+
+async function updateStock(
+id:string
+){
+
+
+
+try{
+
+
+const {
+error
+}=await supabase
+
+.from("products")
+
+.update({
+
+stock:
+Number(stockValues[id])
+
+})
+
+.eq(
+"id",
+id
+);
+
+
+
+
+
+if(error){
+
+throw error;
+
+}
+
+
+
+
+alert(
+"Stock Updated Successfully ✅"
+);
+
+
+
+
+fetchProducts();
+
+
+
+}
+catch(error){
+
+console.log(error);
+
+
+alert(
+"Update failed"
+);
+
+
+}
+
+
+
+}
+
+
+
+
+
+
+
+
+
+if(loading){
+
+
+return(
+
+<div className="
+h-screen
+flex
+items-center
+justify-center
+text-xl
+font-bold
+">
+
+Loading Stock...
+
+</div>
+
+);
+
+
+}
+
+
+
+
+
+
+
+
+return(
 
 
 <main className="
- min-h-screen
- bg-gray-100
- dark:bg-gray-950
- p-5
+min-h-screen
+bg-gray-100
+dark:bg-gray-950
+p-5
 ">
 
 
+
 <h1 className="
- text-3xl
- font-bold
- mb-6
- text-gray-900
- dark:text-white
+text-3xl
+font-bold
+mb-6
+text-gray-900
+dark:text-white
 ">
 
 📦 Stock Management
@@ -231,10 +331,13 @@ return (
 
 
 
+
+
 <div className="
- grid
- gap-5
+grid
+gap-5
 ">
+
 
 
 {
@@ -247,18 +350,17 @@ products.map((product)=>(
 key={product.id}
 
 className="
- bg-white
- dark:bg-gray-900
- rounded-2xl
- shadow
- p-4
- flex
- flex-col
- md:flex-row
- gap-4
- items-center
+bg-white
+dark:bg-gray-900
+rounded-2xl
+shadow
+p-4
+flex
+flex-col
+md:flex-row
+gap-4
+items-center
 "
-
 
 >
 
@@ -274,11 +376,11 @@ product.image ||
 alt={product.name}
 
 className="
- w-24
- h-24
- object-contain
- rounded-xl
- bg-gray-100
+w-24
+h-24
+object-contain
+rounded-xl
+bg-gray-100
 "
 
 />
@@ -286,15 +388,18 @@ className="
 
 
 
+
+
+
 <div className="
- flex-1
+flex-1
 ">
 
 
 <h2 className="
- font-bold
- text-lg
- dark:text-white
+font-bold
+text-lg
+dark:text-white
 ">
 
 {product.name}
@@ -303,20 +408,21 @@ className="
 
 
 
+
 <p className="
- mt-2
- text-gray-500
- dark:text-gray-400
+mt-2
+text-gray-500
+dark:text-gray-400
 ">
 
 Current Stock:
 
 <span className="
- font-bold
- ml-2
+font-bold
+ml-2
 ">
 
-{product.stock}
+{product.stock || 0}
 
 </span>
 
@@ -331,15 +437,17 @@ Current Stock:
 
 
 
+
 <input
 
 type="number"
 
 value={
-stockValues[product.id]
+stockValues[product.id] ?? 0
 }
 
 onChange={(e)=>
+
 
 setStockValues({
 
@@ -350,16 +458,17 @@ Number(e.target.value)
 
 })
 
+
 }
 
 className="
- border
- rounded-lg
- p-3
- w-full
- md:w-32
- dark:bg-gray-800
- dark:text-white
+border
+rounded-lg
+p-3
+w-full
+md:w-32
+dark:bg-gray-800
+dark:text-white
 "
 
 />
@@ -368,22 +477,21 @@ className="
 
 
 
+
+
 <button
 
-onClick={()=>
-updateStock(product.id)
-}
+onClick={()=>updateStock(product.id)}
 
 className="
- bg-green-600
- hover:bg-green-700
- text-white
- px-5
- py-3
- rounded-xl
- font-bold
+bg-green-600
+hover:bg-green-700
+text-white
+px-5
+py-3
+rounded-xl
+font-bold
 "
-
 
 >
 
@@ -398,13 +506,16 @@ Save
 </div>
 
 
-))
 
+))
 
 }
 
 
+
 </div>
+
+
 
 
 

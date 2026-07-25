@@ -2,7 +2,14 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Menu, Search, ShoppingCart, User } from "lucide-react";
+import {
+  Menu,
+  ShoppingCart,
+  User,
+  Bell,
+  Heart,
+  MapPin,
+} from "lucide-react";
 import { useCart } from "@/app/context/CartContext";
 import SideDrawer from "./SideDrawer";
 
@@ -17,90 +24,112 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-white shadow-sm border-b">
+      <header className="sticky top-0 z-50 bg-orange-500 text-white shadow-lg">
 
         {/* Top Header */}
-        <div className="flex items-center justify-between px-4 py-3">
+        <div className="flex items-center justify-between px-4 py-4">
 
           <button
             onClick={() => setDrawerOpen(true)}
-            className="p-2 rounded-lg hover:bg-gray-100"
+            className="p-2 rounded-full hover:bg-orange-600 transition"
           >
             <Menu size={26} />
           </button>
 
-          <Link href="/" className="text-xl font-extrabold text-yellow-600">
-            Nithesh Cosmetics
+          <div className="text-center">
+            <h1 className="text-xl font-extrabold">
+              Nithesh Cosmetics
+            </h1>
+
+            <p className="text-xs text-orange-100">
+              Barber & Cosmetics Store
+            </p>
+          </div>
+
+          <Link
+            href="/profile"
+            className="w-10 h-10 rounded-full bg-white text-orange-500 flex items-center justify-center"
+          >
+            <User size={22} />
           </Link>
 
-          <div className="flex items-center gap-3">
-
-            <Link
-              href="/profile"
-              className="p-2 rounded-lg hover:bg-gray-100"
-            >
-              <User size={22} />
-            </Link>
-
-            <Link
-              href="/cart"
-              className="relative p-2 rounded-lg hover:bg-gray-100"
-            >
-              <ShoppingCart size={22} />
-
-              {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center">
-                  {cartCount}
-                </span>
-              )}
-            </Link>
-
-          </div>
-
         </div>
 
-        {/* Delivery Card */}
+        {/* Delivery Address */}
         <div className="px-4 pb-3">
 
-          <div className="rounded-xl bg-yellow-100 border border-yellow-300 p-3">
+          <div className="bg-white rounded-2xl p-4 text-black">
 
-            <p className="text-xs text-gray-500">
-              Delivering To
-            </p>
+            <div className="flex items-center gap-2">
 
-            <h3 className="font-bold text-gray-800">
-              Nagarkurnool
-            </h3>
+              <MapPin
+                size={18}
+                className="text-orange-500"
+              />
 
-            <p className="text-xs text-gray-600">
-              Near VKR Hospital, Naganool Road
-            </p>
+              <div>
 
-          </div>
+                <p className="text-xs text-gray-500">
+                  Deliver to
+                </p>
 
-        </div>
+                <h3 className="font-bold">
+                  Nagarkurnool
+                </h3>
 
-        {/* Search */}
-        <div className="px-4 pb-4">
+                <p className="text-xs text-gray-500">
+                  Near VKR Hospital
+                </p>
 
-          <div className="flex items-center bg-gray-100 rounded-xl px-3 h-12">
+              </div>
 
-            <Search
-              size={20}
-              className="text-gray-500"
-            />
-
-            <input
-              type="text"
-              placeholder="Search for products..."
-              className="bg-transparent outline-none w-full ml-3 text-sm"
-            />
+            </div>
 
           </div>
 
         </div>
 
       </header>
+
+      {/* Floating Action Icons */}
+      <div className="sticky top-[120px] z-40 bg-white shadow-sm">
+
+        <div className="flex items-center justify-around py-3">
+
+          <Link href="/wishlist">
+            <Heart
+              size={24}
+              className="text-gray-700"
+            />
+          </Link>
+
+          <Link href="/notifications">
+            <Bell
+              size={24}
+              className="text-gray-700"
+            />
+          </Link>
+
+          <Link
+            href="/cart"
+            className="relative"
+          >
+            <ShoppingCart
+              size={24}
+              className="text-gray-700"
+            />
+
+            {cartCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-600 text-white text-[10px] rounded-full w-5 h-5 flex items-center justify-center">
+                {cartCount}
+              </span>
+            )}
+
+          </Link>
+
+        </div>
+
+      </div>
 
       <SideDrawer
         open={drawerOpen}

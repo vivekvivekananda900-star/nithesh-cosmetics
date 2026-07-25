@@ -1,24 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { 
-  createUserWithEmailAndPassword 
-} from "firebase/auth";
-import { 
-  doc, 
-  setDoc 
-} from "firebase/firestore";
-
-import { auth, db } from "@/app/lib/firebase";
+import { supabase } from "@/app/lib/supabase";
 import { useRouter } from "next/navigation";
 
 
-export default function SignupPage(){
+export default function LoginPage() {
 
   const router = useRouter();
 
 
-  const [name,setName] = useState("");
   const [email,setEmail] = useState("");
   const [password,setPassword] = useState("");
 
@@ -26,53 +17,88 @@ export default function SignupPage(){
 
 
 
-  const handleSignup = async(
-    e:React.FormEvent
-  )=>{
+  async function handleLogin(
+    e: React.FormEvent
+  ){
 
     e.preventDefault();
 
 
-    try{
+    try {
 
       setLoading(true);
 
 
-      const userCredential =
-        await createUserWithEmailAndPassword(
-          auth,
-          email,
-          password
+
+      const {
+        data,
+        error
+      } = await supabase.auth.signInWithPassword({
+
+        email,
+
+        password,
+
+      });
+
+
+
+      if(error){
+
+        throw error;
+
+      }
+
+
+
+      const user = data.user;
+
+
+
+      if(!user){
+
+        throw new Error(
+          "Login failed"
         );
 
-
-      const user =
-        userCredential.user;
+      }
 
 
 
-      await setDoc(
-        doc(db,"users",user.uid),
-        {
 
-          name,
+      // Check User Role
 
-          email,
-
-          createdAt:
-            new Date()
-
-        }
-      );
+      const {
+        data: profile,
+        error: profileError
+      } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
 
 
 
-      alert(
-        "Account created successfully!"
-      );
+      if(profileError){
+
+        throw profileError;
+
+      }
 
 
-      router.push("/profile");
+
+
+      if(profile?.role === "admin"){
+
+        router.push("/admin");
+
+      }
+      else{
+
+        router.push("/profile");
+
+      }
+
 
 
     }
@@ -87,113 +113,99 @@ export default function SignupPage(){
 
     }
 
-
-  };
-
+  }
 
 
-  return(
+
+
+  return (
 
     <main className="
-      min-h-screen
-      flex
-      items-center
-      justify-center
-      bg-gray-100
+    min-h-screen
+    flex
+    items-center
+    justify-center
+    bg-gray-100
     ">
 
 
       <form
-        onSubmit={handleSignup}
-        className="
-          bg-white
-          p-8
-          rounded-xl
-          shadow-lg
-          w-96
-        "
+      onSubmit={handleLogin}
+      className="
+      bg-white
+      p-8
+      rounded-xl
+      shadow-lg
+      w-96
+      "
       >
 
 
         <h1 className="
-          text-3xl
-          font-bold
-          text-center
-          mb-6
+        text-3xl
+        font-bold
+        text-center
+        mb-6
         ">
-          Create Account
+          Login
         </h1>
 
 
 
         <input
-          placeholder="Name"
-          className="
-          w-full
-          border
-          p-3
-          rounded-lg
-          mb-4"
-          value={name}
-          onChange={(e)=>
-            setName(e.target.value)
-          }
+        type="email"
+        placeholder="Email"
+        className="
+        w-full
+        border
+        p-3
+        rounded-lg
+        mb-4
+        "
+        value={email}
+        onChange={(e)=>
+          setEmail(e.target.value)
+        }
         />
 
 
 
         <input
-          type="email"
-          placeholder="Email"
-          className="
-          w-full
-          border
-          p-3
-          rounded-lg
-          mb-4"
-          value={email}
-          onChange={(e)=>
-            setEmail(e.target.value)
-          }
-        />
-
-
-
-        <input
-          type="password"
-          placeholder="Password"
-          className="
-          w-full
-          border
-          p-3
-          rounded-lg
-          mb-4"
-          value={password}
-          onChange={(e)=>
-            setPassword(e.target.value)
-          }
+        type="password"
+        placeholder="Password"
+        className="
+        w-full
+        border
+        p-3
+        rounded-lg
+        mb-4
+        "
+        value={password}
+        onChange={(e)=>
+          setPassword(e.target.value)
+        }
         />
 
 
 
         <button
-          disabled={loading}
-          className="
-          w-full
-          bg-green-600
-          text-white
-          py-3
-          rounded-lg
-          "
+        disabled={loading}
+        className="
+        w-full
+        bg-blue-600
+        text-white
+        py-3
+        rounded-lg
+        "
         >
 
-          {
-            loading
-            ?
-            "Creating..."
-            :
-            "Sign Up"
-          }
+        {
+          loading
+          ?
+          "Logging in..."
+          :
+          "Login"
+        }
 
         </button>
 

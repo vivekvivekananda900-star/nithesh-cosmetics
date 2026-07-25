@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { X } from "lucide-react";
+import { X, Home, ShoppingBag, Grid2x2, Heart, User, Phone, MapPin, PackageCheck, LogOut } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 type SideDrawerProps = {
@@ -10,14 +10,13 @@ type SideDrawerProps = {
 };
 
 const menuItems = [
-  { name: "Home", href: "/", icon: "🏠" },
-  { name: "Products", href: "/products", icon: "🛍️" },
-  { name: "Categories", href: "/products", icon: "📦" },
-  { name: "My Orders", href: "/orders", icon: "📋" },
-  { name: "Track Order", href: "/track-order", icon: "🚚" },
-  { name: "Wishlist", href: "/wishlist", icon: "❤️" },
-  { name: "Profile", href: "/profile", icon: "👤" },
-  { name: "Contact Us", href: "/contact", icon: "☎️" },
+  { name: "Home", href: "/", icon: Home },
+  { name: "Products", href: "/products", icon: ShoppingBag },
+  { name: "Categories", href: "/products", icon: Grid2x2 },
+  { name: "Wishlist", href: "/wishlist", icon: Heart },
+  { name: "Orders", href: "/track-order", icon: PackageCheck },
+  { name: "Profile", href: "/profile", icon: User },
+  { name: "Contact", href: "/contact", icon: Phone },
 ];
 
 export default function SideDrawer({
@@ -28,94 +27,119 @@ export default function SideDrawer({
     <AnimatePresence>
       {open && (
         <>
-          {/* Overlay */}
           <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: 0.45 }}
+            animate={{ opacity: 0.5 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
             onClick={onClose}
             className="fixed inset-0 bg-black z-50"
           />
 
-          {/* Drawer */}
           <motion.div
-            initial={{ x: -320 }}
+            initial={{ x: -350 }}
             animate={{ x: 0 }}
-            exit={{ x: -320 }}
-            transition={{ duration: 0.25 }}
+            exit={{ x: -350 }}
+            transition={{ duration: 0.3 }}
             className="fixed top-0 left-0 h-full w-80 bg-white z-[60] shadow-2xl flex flex-col"
           >
             {/* Header */}
-            <div className="bg-yellow-500 text-white p-5 flex items-center justify-between">
-              <div>
-                <h2 className="text-xl font-bold">
-                  Nithesh Cosmetics
-                </h2>
+            <div className="bg-gradient-to-r from-orange-500 to-yellow-500 p-6 text-white">
 
-                <p className="text-sm opacity-90">
-                  Premium Barber Store
-                </p>
+              <div className="flex justify-between items-center">
+
+                <div>
+
+                  <div className="w-16 h-16 rounded-full bg-white text-orange-500 flex items-center justify-center text-2xl font-bold">
+                    N
+                  </div>
+
+                  <h2 className="mt-4 text-2xl font-bold">
+                    Nithesh Cosmetics
+                  </h2>
+
+                  <p className="text-sm text-white/90">
+                    Premium Barber & Cosmetics Store
+                  </p>
+
+                </div>
+
+                <button onClick={onClose}>
+                  <X size={26} />
+                </button>
+
               </div>
 
-              <button
-                onClick={onClose}
-                className="p-2 rounded-full hover:bg-yellow-600"
-              >
-                <X size={24} />
-              </button>
             </div>
 
             {/* Menu */}
-            <div className="flex-1 overflow-y-auto py-3">
+            <div className="flex-1 py-4 overflow-y-auto">
 
-              {menuItems.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  onClick={onClose}
-                  className="flex items-center gap-4 px-6 py-4 hover:bg-gray-100 transition"
-                >
-                  <span className="text-2xl">
-                    {item.icon}
-                  </span>
+              {menuItems.map((item) => {
+                const Icon = item.icon;
 
-                  <span className="font-medium text-gray-800">
-                    {item.name}
-                  </span>
-                </Link>
-              ))}
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    onClick={onClose}
+                    className="flex items-center gap-4 px-6 py-4 hover:bg-orange-50 transition"
+                  >
+                    <Icon
+                      size={22}
+                      className="text-orange-500"
+                    />
+
+                    <span className="font-semibold">
+                      {item.name}
+                    </span>
+                  </Link>
+                );
+              })}
 
             </div>
 
             {/* Footer */}
             <div className="border-t p-5">
-              <p className="font-semibold text-gray-800">
-                📍 Near VKR Hospital
-              </p>
 
-              <p className="text-sm text-gray-500 mt-1">
-                Naganool Road,
-                <br />
-                Nagarkurnool - 509209
-              </p>
+              <div className="flex items-start gap-3">
 
-              <a
+                <MapPin className="text-orange-500" />
+
+                <div>
+
+                  <h4 className="font-semibold">
+                    Store Address
+                  </h4>
+
+                  <p className="text-sm text-gray-500">
+                    Near VKR Hospital
+                    <br />
+                    Naganool Road
+                    <br />
+                    Nagarkurnool
+                  </p>
+
+                </div>
+
+              </div>
+
+              <Link
                 href="tel:+919676578296"
-                className="mt-4 block bg-yellow-500 text-center text-white py-3 rounded-xl font-semibold hover:bg-yellow-600 transition"
+                className="mt-5 block bg-orange-500 text-white text-center py-3 rounded-xl font-semibold"
               >
-                📞 Call Now
-              </a>
+                Call Now
+              </Link>
 
-              <a
-                href="https://wa.me/919676578296"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-3 block bg-green-500 text-center text-white py-3 rounded-xl font-semibold hover:bg-green-600 transition"
+              <Link
+                href="/login"
+                className="mt-3 flex items-center justify-center gap-2 border border-red-500 text-red-500 py-3 rounded-xl font-semibold"
               >
-                💬 WhatsApp
-              </a>
+                <LogOut size={18} />
+                Logout
+              </Link>
+
             </div>
+
           </motion.div>
         </>
       )}

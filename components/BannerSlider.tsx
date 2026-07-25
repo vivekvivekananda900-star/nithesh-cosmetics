@@ -1,227 +1,89 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination } from "swiper/modules";
-
-import {
-  collection,
-  getDocs,
-  query,
-  orderBy,
-} from "firebase/firestore";
-
-import { db } from "@/app/lib/firebase";
+import { supabase } from "@/app/lib/supabase";
 
 import "swiper/css";
 import "swiper/css/pagination";
 
-
 interface Banner {
-
-  id:string;
-
-  title:string;
-
-  subtitle:string;
-
-  image:string;
-
+  id: string;
+  title: string;
+  subtitle: string;
+  image: string;
 }
 
+export default function BannerSlider() {
+  const [banners, setBanners] = useState<Banner[]>([]);
 
-
-export default function BannerSlider(){
-
-  const [banners,setBanners] =
-    useState<Banner[]>([]);
-
-
-
-  useEffect(()=>{
-
+  useEffect(() => {
     loadBanners();
+  }, []);
 
-  },[]);
+  async function loadBanners() {
+    const { data, error } = await supabase
+      .from("banners")
+      .select("*")
+      .order("created_at", { ascending: false });
 
-
-
-
-  async function loadBanners(){
-
-    try{
-
-      const q = query(
-        collection(db,"banners"),
-        orderBy("createdAt","desc")
-      );
-
-
-      const snapshot =
-        await getDocs(q);
-
-
-
-      const data =
-        snapshot.docs.map((doc)=>({
-
-          id:doc.id,
-
-          ...doc.data()
-
-        })) as Banner[];
-
-
-
-      setBanners(data);
-
-
-
-    }catch(error){
-
-      console.log(
-        "Banner loading error",
-        error
-      );
-
+    if (error) {
+      console.error("Banner loading error:", error);
+      return;
     }
 
+    setBanners(data as Banner[]);
   }
 
-
-
-
-  if(banners.length===0){
-
-    return null;
-
-  }
-
-
+  if (banners.length === 0) return null;
 
   return (
-
     <div className="px-4 mt-4">
-
-
       <Swiper
-
-        modules={[
-          Autoplay,
-          Pagination
-        ]}
-
+        modules={[Autoplay, Pagination]}
         autoplay={{
-          delay:3000,
-          disableOnInteraction:false,
+          delay: 3500,
+          disableOnInteraction: false,
         }}
-
-        pagination={{
-          clickable:true
-        }}
-
+        pagination={{ clickable: true }}
         loop
-
         spaceBetween={15}
-
       >
-
-
-      {
-        banners.map((banner)=>(
-
-
-          <SwiperSlide
-            key={banner.id}
-          >
-
-
-            <div className="
-              rounded-3xl
-              overflow-hidden
-              shadow-xl
-              bg-white
-            ">
-
+        {banners.map((banner) => (
+          <SwiperSlide key={banner.id}>
+            <div className="relative overflow-hidden rounded-3xl shadow-xl">
 
               <img
-
                 src={banner.image}
-
                 alt={banner.title}
-
-                className="
-                  w-full
-                  h-52
-                  object-cover
-                "
-
+                className="w-full h-56 object-cover"
               />
 
+              <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/20" />
 
-
-              <div className="
-                p-6
-                bg-gradient-to-r
-                from-yellow-500
-                to-orange-500
-                text-white
-              ">
-
-
-                <p className="text-sm">
+              <div className="absolute left-0 right-0 bottom-0 p-6 text-white">
+                <p className="text-sm font-medium text-orange-300">
                   Nithesh Cosmetics
                 </p>
 
-
-                <h2 className="
-                  text-3xl
-                  font-bold
-                  mt-2
-                ">
+                <h2 className="text-3xl font-bold mt-2">
                   {banner.title}
                 </h2>
 
-
-                <p className="mt-2">
+                <p className="mt-2 text-white/90">
                   {banner.subtitle}
                 </p>
 
-
-                <button
-                  className="
-                    mt-5
-                    bg-white
-                    text-black
-                    px-5
-                    py-2
-                    rounded-xl
-                    font-semibold
-                  "
-                >
+                <button className="mt-5 bg-orange-500 hover:bg-orange-600 transition px-6 py-3 rounded-xl font-semibold">
                   Shop Now
                 </button>
-
-
               </div>
 
-
             </div>
-
-
           </SwiperSlide>
-
-
-        ))
-      }
-
-
+        ))}
       </Swiper>
-
-
     </div>
-
   );
-
 }

@@ -1,284 +1,658 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import AdminGuard from "@/components/AdminGuard";
-
-import {
-  collection,
-  getDocs,
-  orderBy,
-  query,
-  doc,
-  updateDoc,
-  Timestamp,
-} from "firebase/firestore";
-
-import { db } from "@/app/lib/firebase";
+import { supabase } from "@/app/lib/supabase";
+import { useRouter } from "next/navigation";
 
 
 interface Product {
-  name: string;
-  price: number;
-  quantity: number;
+
+  name:string;
+
+  price:number;
+
+  quantity:number;
+
 }
+
 
 
 interface Order {
-  id: string;
 
-  customerName?: string;
+  id:string;
 
-  phone?: string;
+  customer_name?:string;
 
-  address?: string;
+  phone?:string;
 
-  products?: Product[];
+  address?:string;
 
-  total?: number;
+  products?:Product[];
 
-  status?: string;
+  total?:number;
 
-  location?: string;
+  status?:string;
+
+  location?:string;
+
 }
 
 
 
-export default function OrdersPage() {
 
 
-  const [orders, setOrders] =
-    useState<Order[]>([]);
 
 
+export default function OrdersPage(){
 
-  const fetchOrders = async () => {
 
-    const q = query(
-      collection(db, "orders"),
-      orderBy("createdAt", "desc")
-    );
+const router = useRouter();
 
 
-    const snapshot =
-      await getDocs(q);
+const [orders,setOrders] =
+useState<Order[]>([]);
 
 
+const [loading,setLoading] =
+useState(true);
 
-    const data =
-      snapshot.docs.map((item)=>({
 
-        id:item.id,
 
-        ...(item.data() as Omit<Order,"id">),
 
-      }));
 
 
-    setOrders(data);
 
-  };
 
 
+useEffect(()=>{
 
+checkAdmin();
 
-  useEffect(()=>{
+},[]);
 
-    fetchOrders();
 
-  },[]);
 
 
 
 
 
-  const updateOrder = async(
-    id:string,
-    status:string,
-    location:string
-  )=>{
 
 
-    await updateDoc(
+async function checkAdmin(){
 
-      doc(db,"orders",id),
 
-      {
-        status,
-        location,
-        updatedAt:Timestamp.now()
-      }
+const {
+data:{
+user
+}
+}=await supabase.auth.getUser();
 
-    );
 
 
-    fetchOrders();
 
-  };
-return (
-  <AdminGuard>
+if(!user){
 
-    <div className="max-w-6xl mx-auto p-6">
+router.push("/login");
 
-      <h1 className="text-4xl font-bold mb-8">
-        Admin Orders 📦
-      </h1>
+return;
 
+}
 
-      {orders.map((order)=>(
 
-        <div
-          key={order.id}
-          className="border rounded-xl p-6 mb-6 shadow"
-        >
 
-          <h2 className="text-2xl font-bold">
-            {order.customerName || "Unknown Customer"}
-          </h2>
 
 
-          <p>
-            📱 {order.phone || "No Phone"}
-          </p>
 
+const {data:profile}=await supabase
 
-          <p>
-            📍 {order.address || "No Address"}
-          </p>
+.from("profiles")
 
+.select("role")
 
+.eq("id",user.id)
 
-          <h3 className="font-bold mt-5">
-            Products
-          </h3>
+.single();
 
 
-          {order.products &&
-          order.products.length > 0 ? (
 
-            order.products.map(
-              (item,index)=>(
 
-                <p key={index}>
 
-                  {item.name}
-                  {" x "}
-                  {item.quantity}
-                  {" = "}
-                  ₹
-                  {item.price * item.quantity}
 
-                </p>
+if(profile?.role !== "admin"){
 
-              )
+router.push("/");
 
-            )
+return;
 
-          ) : (
+}
 
-            <p className="text-gray-500">
-              No products found
-            </p>
 
-          )}
 
 
+fetchOrders();
 
-          <h2 className="text-xl font-bold mt-4">
-            Total: ₹{order.total || 0}
-          </h2>
 
 
+}
 
-          <div className="mt-5">
 
-            <label className="font-bold">
-              Order Status:
-            </label>
 
 
-            <select
-              id={`status-${order.id}`}
-              defaultValue={order.status || "Pending"}
-              className="ml-3 border p-2 rounded"
-            >
 
-              <option>Pending</option>
-              <option>Confirmed</option>
-              <option>Shipped</option>
-              <option>Out for Delivery</option>
-              <option>Delivered</option>
 
-            </select>
 
-          </div>
 
 
 
-          <div className="mt-4">
+async function fetchOrders(){
 
-            <label className="font-bold">
-              🚚 Delivery Location:
-            </label>
 
+const {
+data,
+error
+}=await supabase
 
-            <input
-              id={`location-${order.id}`}
-              defaultValue={order.location || ""}
-              placeholder="Example: Hyderabad Hub"
-              className="ml-3 border p-2 rounded"
-            />
+.from("orders")
 
+.select("*")
 
-
-            <button
-
-              onClick={()=>{
-
-                const status =
-                (
-                  document.getElementById(
-                    `status-${order.id}`
-                  ) as HTMLSelectElement
-                ).value;
-
-
-                const location =
-                (
-                  document.getElementById(
-                    `location-${order.id}`
-                  ) as HTMLInputElement
-                ).value;
-
-
-
-                updateOrder(
-                  order.id,
-                  status,
-                  location
-                );
-
-              }}
-
-              className="ml-3 bg-black text-white px-5 py-2 rounded"
-
-            >
-
-              Update
-
-            </button>
-
-
-          </div>
-
-
-        </div>
-
-      ))}
-
-
-    </div>
-
-  </AdminGuard>
+.order(
+"created_at",
+{
+ascending:false
+}
 );
+
+
+
+
+
+
+if(error){
+
+console.log(error);
+
+return;
+
+}
+
+
+
+
+
+setOrders(
+(data || []) as Order[]
+);
+
+
+
+setLoading(false);
+
+
+}
+
+
+
+
+
+
+
+
+
+async function updateOrder(
+
+id:string,
+
+status:string,
+
+location:string
+
+){
+
+
+
+const {
+error
+}=await supabase
+
+.from("orders")
+
+.update({
+
+status,
+
+location,
+
+updated_at:new Date()
+
+})
+
+.eq(
+"id",
+id
+);
+
+
+
+
+
+
+if(error){
+
+alert(error.message);
+
+return;
+
+}
+
+
+
+
+
+alert(
+"Order Updated ✅"
+);
+
+
+
+fetchOrders();
+
+
+
+}
+
+
+
+
+
+
+
+
+
+if(loading){
+
+return(
+
+<div className="
+min-h-screen
+flex
+items-center
+justify-center
+font-bold
+text-xl
+">
+
+Loading Orders...
+
+</div>
+
+);
+
+}
+
+
+
+
+
+
+
+
+return (
+
+<div className="
+max-w-6xl
+mx-auto
+p-6
+">
+
+
+
+
+
+<h1 className="
+text-4xl
+font-bold
+mb-8
+">
+
+Admin Orders 📦
+
+</h1>
+
+
+
+
+
+
+
+{
+
+orders.length === 0 ? (
+
+
+<p className="
+text-gray-500
+">
+
+No Orders Found
+
+</p>
+
+
+
+)
+
+:
+
+(
+
+
+orders.map((order)=>(
+
+
+<div
+
+key={order.id}
+
+className="
+border
+rounded-xl
+p-6
+mb-6
+shadow
+bg-white
+"
+
+>
+
+
+
+
+<h2 className="
+text-2xl
+font-bold
+">
+
+{order.customer_name || "Unknown Customer"}
+
+</h2>
+
+
+
+
+<p>
+📱 {order.phone || "No Phone"}
+</p>
+
+
+
+<p>
+📍 {order.address || "No Address"}
+</p>
+
+
+
+
+
+
+
+
+<h3 className="
+font-bold
+mt-5
+">
+
+Products
+
+</h3>
+
+
+
+
+
+
+
+{
+
+order.products?.length ? (
+
+
+order.products.map(
+(item,index)=>(
+
+
+<p key={index}>
+
+{item.name}
+
+{" × "}
+
+{item.quantity}
+
+{" = ₹"}
+
+{item.price * item.quantity}
+
+
+</p>
+
+
+
+)
+
+
+)
+
+
+)
+
+:(
+
+
+<p className="
+text-gray-500
+">
+
+No products found
+
+</p>
+
+
+)
+
+
+
+}
+
+
+
+
+
+
+
+<h2 className="
+text-xl
+font-bold
+mt-4
+">
+
+Total: ₹{order.total || 0}
+
+</h2>
+
+
+
+
+
+
+
+
+
+<div className="
+mt-5
+flex
+gap-3
+items-center
+flex-wrap
+">
+
+
+
+
+
+<select
+
+id={`status-${order.id}`}
+
+defaultValue={
+order.status || "Pending"
+}
+
+className="
+border
+p-2
+rounded
+"
+
+>
+
+
+<option>
+Pending
+</option>
+
+
+<option>
+Confirmed
+</option>
+
+
+<option>
+Shipped
+</option>
+
+
+<option>
+Out for Delivery
+</option>
+
+
+<option>
+Delivered
+</option>
+
+
+</select>
+
+
+
+
+
+
+
+<input
+
+id={`location-${order.id}`}
+
+defaultValue={
+order.location || ""
+}
+
+placeholder="Delivery Location"
+
+className="
+border
+p-2
+rounded
+"
+
+/>
+
+
+
+
+
+
+
+
+<button
+
+onClick={()=>{
+
+
+const status =
+(
+document.getElementById(
+`status-${order.id}`
+) as HTMLSelectElement
+).value;
+
+
+
+const location =
+(
+document.getElementById(
+`location-${order.id}`
+) as HTMLInputElement
+).value;
+
+
+
+
+updateOrder(
+order.id,
+status,
+location
+);
+
+
+
+}}
+
+
+className="
+bg-black
+text-white
+px-5
+py-2
+rounded-lg
+"
+
+>
+
+Update
+
+</button>
+
+
+
+
+
+</div>
+
+
+
+
+
+
+</div>
+
+
+
+))
+
+
+)
+
+
+}
+
+
+
+</div>
+
+
+);
+
 
 }
