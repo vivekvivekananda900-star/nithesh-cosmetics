@@ -1,25 +1,39 @@
 @import "tailwindcss";
 
+
 :root {
-  --background: #fff7ed; /* premium light orange */
+
+  --background: #fff7ed;
   --foreground: #1f2937;
 
-  --primary: #f97316; /* orange */
+  --primary: #f97316;
+
   --card: #ffffff;
+
   --border: #fed7aa;
+
 }
+
 
 
 @media (prefers-color-scheme: dark) {
+
   :root {
-    --background: #111827; /* dark premium */
+
+    --background: #111827;
+
     --foreground: #f9fafb;
 
     --primary: #fb923c;
+
     --card: #1f2937;
+
     --border: #374151;
+
   }
+
 }
+
 
 
 @theme inline {
@@ -41,6 +55,30 @@
 }
 
 
+
+/* Global Mobile Fix */
+
+html,
+body {
+
+  width: 100%;
+
+  max-width: 100%;
+
+  overflow-x: hidden;
+
+}
+
+
+
+* {
+
+  box-sizing: border-box;
+
+}
+
+
+
 body {
 
   background: var(--background);
@@ -48,5 +86,41 @@ body {
   color: var(--foreground);
 
   font-family: Arial, Helvetica, sans-serif;
+
+  margin: 0;
+
+  padding: 0;
+
+}
+
+
+
+/* Smooth mobile scrolling */
+
+html {
+
+  scroll-behavior: smooth;
+
+}
+
+
+
+/* Prevent images causing overflow */
+
+img {
+
+  max-width: 100%;
+
+  height: auto;
+
+}
+
+
+
+/* Safe area for mobile bottom navigation */
+
+.pb-safe {
+
+  padding-bottom: env(safe-area-inset-bottom);
 
 }
