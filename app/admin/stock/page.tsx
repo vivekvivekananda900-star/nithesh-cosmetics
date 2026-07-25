@@ -86,9 +86,9 @@ const {data:profile}=await supabase
 
 .select("role")
 
-.eq("id",user.id)
+.eq("uuid",user.id)
 
-.single();
+.maybeSingle();
 
 
 

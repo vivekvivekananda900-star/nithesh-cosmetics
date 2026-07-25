@@ -14,8 +14,9 @@ export default async function AdminLayout({
   } = await supabase.auth.getUser();
 
 
+  // Allow admin login page
   if (!user) {
-    redirect("/login");
+    return <>{children}</>;
   }
 
 
@@ -23,7 +24,7 @@ export default async function AdminLayout({
     .from("profiles")
     .select("role")
     .eq("uuid", user.id)
-    .single();
+    .maybeSingle();
 
 
   if (error || profile?.role !== "admin") {

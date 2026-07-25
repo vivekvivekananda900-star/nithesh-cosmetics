@@ -71,9 +71,9 @@ export default function LoginPage() {
 
         .select("role")
 
-        .eq("id", user.id)
+        .eq("uuid", user.id)
 
-        .single();
+        .maybeSingle();
 
 
 

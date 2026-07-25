@@ -68,7 +68,7 @@ export default function AdminLoginPage() {
 
         .eq("uuid", user.id)
 
-        .single();
+        .maybeSingle();
 
 
 
