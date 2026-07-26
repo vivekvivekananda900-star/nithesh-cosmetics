@@ -9,6 +9,8 @@ export function generateInvoice(
     address: string;
   },
   items: any[],
+  productTotal: number,
+  deliveryFee: number,
   total: number
 ) {
 
@@ -33,6 +35,7 @@ export function generateInvoice(
     doc.setFont("helvetica", "bold");
     doc.setFontSize(22);
 
+
     doc.text(
       "NITHESH COSMETICS",
       105,
@@ -41,6 +44,7 @@ export function generateInvoice(
         align: "center",
       }
     );
+
 
 
     doc.setFont("helvetica", "normal");
@@ -77,6 +81,7 @@ export function generateInvoice(
     );
 
 
+
     doc.line(
       14,
       48,
@@ -88,6 +93,7 @@ export function generateInvoice(
 
     doc.setFont("helvetica", "bold");
     doc.setFontSize(12);
+
 
 
     doc.text(
@@ -112,6 +118,7 @@ export function generateInvoice(
     );
 
 
+
     doc.setFont("helvetica", "normal");
 
 
@@ -134,6 +141,7 @@ export function generateInvoice(
       14,
       94
     );
+
 
 
 
@@ -258,7 +266,6 @@ export function generateInvoice(
 
 
 
-
     doc.setFont(
       "helvetica",
       "bold"
@@ -285,14 +292,32 @@ export function generateInvoice(
 
 
 
+    doc.text(
+      `Product Total : Rs. ${productTotal}`,
+      14,
+      finalY + 16
+    );
+
+
+
+    doc.text(
+      `Delivery Fee : Rs. ${deliveryFee}`,
+      14,
+      finalY + 24
+    );
+
+
+
     doc.setFontSize(15);
+
 
 
     doc.text(
       `Grand Total : Rs. ${total}`,
       14,
-      finalY + 18
+      finalY + 36
     );
+
 
 
 
@@ -304,7 +329,7 @@ export function generateInvoice(
     doc.text(
       "Payment Method : Cash on Delivery",
       14,
-      finalY + 30
+      finalY + 48
     );
 
 
@@ -312,17 +337,18 @@ export function generateInvoice(
     doc.text(
       "Order Status : Pending",
       14,
-      finalY + 38
+      finalY + 56
     );
 
 
 
     doc.line(
       14,
-      finalY + 46,
+      finalY + 64,
       196,
-      finalY + 46
+      finalY + 64
     );
+
 
 
 
@@ -330,7 +356,7 @@ export function generateInvoice(
     doc.text(
       "Thank you for shopping with Nithesh Cosmetics!",
       105,
-      finalY + 58,
+      finalY + 76,
       {
         align:"center",
       }
@@ -341,11 +367,12 @@ export function generateInvoice(
     doc.text(
       "Visit Again ❤️",
       105,
-      finalY + 66,
+      finalY + 84,
       {
         align:"center",
       }
     );
+
 
 
 
@@ -356,6 +383,7 @@ export function generateInvoice(
 
 
   };
+
 
 
 

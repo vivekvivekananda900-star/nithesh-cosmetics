@@ -34,39 +34,27 @@ export default function CheckoutPage() {
 
 
 
-
-
   useEffect(()=>{
-
 
     const loadProfile = async()=>{
 
-
-      const user =
-        auth.currentUser;
-
+      const user = auth.currentUser;
 
       if(!user) return;
 
 
-
-      const snap =
-        await getDoc(
-          doc(
-            db,
-            "users",
-            user.uid
-          )
-        );
-
+      const snap = await getDoc(
+        doc(
+          db,
+          "users",
+          user.uid
+        )
+      );
 
 
       if(snap.exists()){
 
-
-        const data =
-          snap.data();
-
+        const data = snap.data();
 
 
         setName(
@@ -83,9 +71,7 @@ export default function CheckoutPage() {
           data.address || ""
         );
 
-
       }
-
 
     };
 
@@ -99,15 +85,12 @@ export default function CheckoutPage() {
 
 
 
-
-
   const productTotal =
     cart.reduce(
       (sum,item)=>
         sum +
         item.price *
         item.quantity,
-
       0
     );
 
@@ -115,12 +98,17 @@ export default function CheckoutPage() {
 
 
 
-  // Delivery Fee
-
+  // Delivery fee from product
   const deliveryFee =
-    productTotal >= 500
-      ? 0
-      : 50;
+    cart.reduce(
+      (sum,item)=>
+        sum +
+        (item.deliveryFee || 0) *
+        item.quantity,
+      0
+    );
+
+
 
 
 
@@ -133,9 +121,6 @@ export default function CheckoutPage() {
 
 
 
-
-
-  // Current Location
 
   const getCurrentLocation = ()=>{
 
@@ -153,7 +138,6 @@ export default function CheckoutPage() {
 
 
     navigator.geolocation.getCurrentPosition(
-
 
       (position)=>{
 
@@ -184,7 +168,6 @@ export default function CheckoutPage() {
       },
 
 
-
       ()=>{
 
         alert(
@@ -193,11 +176,11 @@ export default function CheckoutPage() {
 
       }
 
-
     );
 
 
   };
+
 
 
 
@@ -226,7 +209,7 @@ export default function CheckoutPage() {
 
 
 
-    if(cart.length===0){
+    if(cart.length === 0){
 
       alert(
         "Cart is empty"
@@ -235,7 +218,6 @@ export default function CheckoutPage() {
       return;
 
     }
-
 
 
 
@@ -260,12 +242,12 @@ export default function CheckoutPage() {
 
           {
 
-
             userId:
               user?.uid || "",
 
 
-            customerName:name,
+            customerName:
+              name,
 
 
             phone,
@@ -275,7 +257,8 @@ export default function CheckoutPage() {
 
 
 
-            products:cart,
+            products:
+              cart,
 
 
 
@@ -299,7 +282,6 @@ export default function CheckoutPage() {
             createdAt:
               Timestamp.now()
 
-
           }
 
         );
@@ -309,6 +291,8 @@ export default function CheckoutPage() {
 
 
 
+
+      // Generate Invoice with Delivery Fee
 
       generateInvoice(
 
@@ -322,9 +306,14 @@ export default function CheckoutPage() {
 
         cart,
 
+        productTotal,
+
+        deliveryFee,
+
         total
 
       );
+
 
 
 
@@ -354,7 +343,6 @@ ${address}
 
 
 
-
       cart.forEach((item)=>{
 
 
@@ -378,6 +366,9 @@ Price:
 
       message +=
 `
+📦 Product Total:
+₹${productTotal}
+
 🚚 Delivery Fee:
 ₹${deliveryFee}
 
@@ -397,8 +388,6 @@ Thank you 🙏`;
 
 
 
-
-
       window.open(
         whatsappURL,
         "_blank"
@@ -415,8 +404,6 @@ Thank you 🙏`;
       router.push(
         `/order-success?orderId=${orderRef.id}`
       );
-
-
 
 
 
@@ -455,7 +442,6 @@ Thank you 🙏`;
 
 
 
-
       <div className="grid md:grid-cols-2 gap-8">
 
 
@@ -464,57 +450,25 @@ Thank you 🙏`;
 
 
           <input
-
             value={name}
-
-            onChange={(e)=>
-              setName(e.target.value)
-            }
-
+            onChange={(e)=>setName(e.target.value)}
             placeholder="Full Name"
-
-            className="
-            w-full
-            border
-            p-3
-            rounded-lg
-            "
-
+            className="w-full border p-3 rounded-lg"
           />
-
-
 
 
 
           <input
-
             value={phone}
-
-            onChange={(e)=>
-              setPhone(e.target.value)
-            }
-
+            onChange={(e)=>setPhone(e.target.value)}
             placeholder="Phone Number"
-
-            className="
-            w-full
-            border
-            p-3
-            rounded-lg
-            "
-
+            className="w-full border p-3 rounded-lg"
           />
 
 
 
-
-
-
-
           <button
-
             onClick={getCurrentLocation}
-
             className="
             w-full
             bg-blue-600
@@ -523,7 +477,6 @@ Thank you 🙏`;
             rounded-lg
             font-bold
             "
-
           >
 
             📍 Use Current Location
@@ -533,16 +486,11 @@ Thank you 🙏`;
 
 
 
-
-
-
           <textarea
 
             value={address}
 
-            onChange={(e)=>
-              setAddress(e.target.value)
-            }
+            onChange={(e)=>setAddress(e.target.value)}
 
             placeholder="Delivery Address"
 
@@ -557,7 +505,6 @@ Thank you 🙏`;
           />
 
 
-
         </div>
 
 
@@ -565,19 +512,12 @@ Thank you 🙏`;
 
 
 
-
-        <div className="
-        border
-        rounded-xl
-        p-6
-        ">
-
+        <div className="border rounded-xl p-6">
 
 
           <h2 className="text-2xl font-bold mb-5">
             Order Summary
           </h2>
-
 
 
 
@@ -595,20 +535,19 @@ Thank you 🙏`;
               "
             >
 
-
               <span>
 
                 {item.name}
+
                 <br/>
+
                 Qty: {item.quantity}
 
               </span>
 
 
               <b>
-
                 ₹{item.price * item.quantity}
-
               </b>
 
 
@@ -621,42 +560,33 @@ Thank you 🙏`;
 
 
 
-
           <p className="mt-4">
-
             Products:
             ₹{productTotal}
-
           </p>
 
 
 
-          <p>
 
+          <p>
             Delivery:
             {
               deliveryFee === 0
               ? "Free"
               : `₹${deliveryFee}`
             }
-
           </p>
 
 
 
 
 
-          <h2 className="
-          text-3xl
-          font-bold
-          mt-5
-          ">
+          <h2 className="text-3xl font-bold mt-5">
 
             Total:
             ₹{total}
 
           </h2>
-
 
 
 
@@ -687,7 +617,9 @@ Thank you 🙏`;
         </div>
 
 
+
       </div>
+
 
 
     </main>

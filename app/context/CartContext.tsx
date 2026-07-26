@@ -15,10 +15,12 @@ interface Product {
   category?: string;
   image?: string;
   description?: string;
+  deliveryFee?: number;
 }
 
 
 interface CartItem extends Product {
+  deliveryFee: number;
   quantity: number;
 }
 
@@ -50,7 +52,7 @@ export function CartProvider({
 
 
 
-  // Load cart
+  // Load cart from localStorage
   useEffect(() => {
 
     const savedCart =
@@ -86,7 +88,7 @@ export function CartProvider({
 
 
 
-  // Add to Cart
+  // Add To Cart
   const addToCart = (
     product: Product
   ) => {
@@ -105,18 +107,18 @@ export function CartProvider({
 
       if (existing) {
 
-        return prev.map((item) =>
+        return prev.map(
+          (item) =>
 
-          item.id === product.id
+            item.id === product.id
 
-            ? {
-                ...item,
-                quantity:
-                  item.quantity + 1,
-              }
+              ? {
+                  ...item,
+                  quantity:
+                    item.quantity + 1,
+                }
 
-            : item
-
+              : item
         );
 
       }
@@ -129,6 +131,10 @@ export function CartProvider({
 
         {
           ...product,
+
+          deliveryFee:
+            product.deliveryFee || 0,
+
           quantity: 1,
         },
 
@@ -173,24 +179,24 @@ export function CartProvider({
 
     setCart((prev) =>
 
-      prev.map((item) =>
+      prev.map(
+        (item) =>
 
-        item.id === id
+          item.id === id
 
-          ? {
-              ...item,
-              quantity:
-                item.quantity + 1,
-            }
+            ? {
+                ...item,
+                quantity:
+                  item.quantity + 1,
+              }
 
-          : item
+            : item
 
       )
 
     );
 
   };
-
 
 
 
@@ -206,7 +212,9 @@ export function CartProvider({
     setCart((prev) =>
 
       prev
-        .map((item) =>
+
+      .map(
+        (item) =>
 
           item.id === id
 
@@ -218,11 +226,12 @@ export function CartProvider({
 
             : item
 
-        )
-        .filter(
-          (item) =>
-            item.quantity > 0
-        )
+      )
+
+      .filter(
+        (item) =>
+          item.quantity > 0
+      )
 
     );
 
@@ -234,7 +243,7 @@ export function CartProvider({
 
 
 
-  // Clear cart
+  // Clear Cart
   const clearCart = () => {
 
     setCart([]);
@@ -256,12 +265,19 @@ export function CartProvider({
     <CartContext.Provider
 
       value={{
+
         cart,
+
         addToCart,
+
         removeFromCart,
+
         increaseQuantity,
+
         decreaseQuantity,
+
         clearCart,
+
       }}
 
     >
@@ -281,6 +297,7 @@ export function CartProvider({
 
 
 export function useCart() {
+
 
   const context =
     useContext(CartContext);
