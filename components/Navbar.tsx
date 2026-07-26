@@ -112,7 +112,7 @@ export default function Navbar() {
 
 
           <Link
-            href="/profile"
+            href="/account"
             className="
               w-9
               h-9

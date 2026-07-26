@@ -27,6 +27,11 @@ export default function AddProduct() {
   }
 
   setLoading(true);
+  const {
+  data: { user },
+} = await supabase.auth.getUser();
+
+alert(JSON.stringify(user, null, 2));
 
   try {
     let imageUrl = "";

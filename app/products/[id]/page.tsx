@@ -33,6 +33,7 @@ interface Product {
   image?: string;
   images?: string[];
   stock?: number;
+  deliveryFee?: number;
 }
 
 export default function ProductDetailsPage() {
@@ -83,6 +84,7 @@ export default function ProductDetailsPage() {
           "/placeholder.png",
         images: data.images || [],
         stock: Number(data.stock) || 0,
+        deliveryFee: Number(data.deliveryfee) || 0,
       };
 
       setProduct(currentProduct);
@@ -463,7 +465,13 @@ export default function ProductDetailsPage() {
 
     <div className="flex items-center gap-2">
       <Truck size={20} />
-      <span>Free Delivery Available</span>
+      <span>
+  {
+    product.deliveryFee === 0
+      ? "Free Delivery Available"
+      : `Delivery Fee ₹${product.deliveryFee}`
+  }
+</span>
     </div>
 
     <div className="flex items-center gap-2">

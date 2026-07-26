@@ -1,353 +1,231 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { auth, db } from "@/app/lib/firebase";
+import Link from "next/link";
+import { supabase } from "@/app/lib/supabase";
 
-import {
-  collection,
-  getDocs,
-  query,
-  where,
-} from "firebase/firestore";
+type Product = {
+  id?: string;
+  name: string;
+  price: number;
+  quantity: number;
+  image?: string;
+};
 
-import { onAuthStateChanged } from "firebase/auth";
-
+type Order = {
+  id: string;
+  user_id: string;
+  customer_name: string;
+  phone: string;
+  address: string;
+  products: Product[];
+  total: number;
+  Order_status: string;
+  created_at: string;
+};
 
 export default function MyOrdersPage() {
-
-  const [orders, setOrders] = useState<any[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
 
-
-
   useEffect(() => {
-
-    const unsubscribe = onAuthStateChanged(
-      auth,
-      (user) => {
-
-        if (user) {
-
-          fetchOrders(user.uid);
-
-        } else {
-
-          setOrders([]);
-          setLoading(false);
-
-        }
-
-      }
-    );
-
-
-    return () => unsubscribe();
-
+    loadOrders();
   }, []);
 
+  async function loadOrders() {
+    setLoading(true);
 
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-
-
-
-  const fetchOrders = async (uid: string) => {
-
-    try {
-
-      const q = query(
-
-        collection(db, "orders"),
-
-        where(
-          "userId",
-          "==",
-          uid
-        )
-
-      );
-
-
-
-      const snapshot =
-        await getDocs(q);
-
-
-
-      const data: any[] =
-        snapshot.docs.map((doc) => ({
-
-          id: doc.id,
-
-          ...doc.data(),
-
-        }));
-
-
-
-      setOrders(data);
-
-
-
-    } catch(error) {
-
-      console.log(
-        "Orders Error:",
-        error
-      );
-
+    if (!user) {
+      setLoading(false);
+      return;
     }
 
+    const { data, error } = await supabase
+      .from("orders")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false });
 
+    if (error) {
+      console.error(error);
+      setLoading(false);
+      return;
+    }
+
+    setOrders((data as Order[]) || []);
     setLoading(false);
-
-  };
-
-
-
-
-
-
-
-  if (loading) {
-
-    return (
-
-      <div className="
-        min-h-screen
-        flex
-        items-center
-        justify-center
-        text-xl
-        font-bold
-      ">
-
-        Loading Orders...
-
-      </div>
-
-    );
-
   }
 
-
-
-
-
-
+  if (loading) {
+    return (
+      <main className="min-h-screen flex items-center justify-center">
+        <p className="text-xl font-bold">
+          Loading Orders...
+        </p>
+      </main>
+    );
+  }
 
   return (
+    <main className="min-h-screen bg-gray-100">
 
-    <main className="
-      min-h-screen
-      bg-gray-100
-      p-5
-    ">
+      <div className="sticky top-0 bg-white shadow p-4">
+        <h1 className="text-2xl font-bold text-center">
+          📦 My Orders
+        </h1>
+      </div>
 
+      <div className="p-4">
 
-      <h1 className="
-        text-3xl
-        font-bold
-        mb-6
-      ">
+        {orders.length === 0 ? (
 
-        📦 My Orders
+          <div className="bg-white rounded-2xl shadow p-8 text-center">
 
-      </h1>
+            <h2 className="text-2xl font-bold">
+              No Orders Yet
+            </h2>
 
-
-
-
-
-      {
-        orders.length === 0 ? (
-
-          <div className="
-            bg-white
-            p-6
-            rounded-xl
-            shadow
-          ">
-
-            <p className="text-gray-500">
-
-              No orders found.
-
+            <p className="text-gray-500 mt-2">
+              Start shopping to see your orders here.
             </p>
+
+            <Link
+              href="/products"
+              className="inline-block mt-6 bg-orange-500 text-white px-6 py-3 rounded-xl"
+            >
+              Continue Shopping
+            </Link>
 
           </div>
 
-
         ) : (
 
+          <div className="space-y-5">
+            {orders.map((order) => (
+              <div
+                key={order.id}
+                className="bg-white rounded-2xl shadow-md p-5"
+              >
+                {/* Header */}
+                <div className="flex items-center justify-between">
 
-          orders.map((order) => (
+                  <div>
+                    <p className="text-sm text-gray-500">
+                      Order ID
+                    </p>
 
+                    <h2 className="font-bold text-lg">
+                      #{order.id}
+                    </h2>
+                  </div>
 
-            <div
+                  <span className="bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-sm font-semibold">
+                    {order.Order_status || "Pending"}
+                  </span>
 
-              key={order.id}
+                </div>
 
-              className="
-                bg-white
-                rounded-xl
-                shadow
-                p-5
-                mb-5
-              "
+                {/* Date */}
+                <p className="text-gray-500 text-sm mt-2">
+                  {new Date(order.created_at).toLocaleString()}
+                </p>
 
-            >
+                {/* Address */}
+                <div className="mt-4">
+                  <p className="font-semibold">
+                    Delivery Address
+                  </p>
 
+                  <p className="text-gray-600">
+                    {order.address}
+                  </p>
+                </div>
 
-              <h2 className="font-bold">
+                {/* Total */}
+                <div className="mt-4 flex justify-between items-center">
 
-                Order ID:
+                  <span className="font-semibold">
+                    Total Amount
+                  </span>
 
-                <span className="
-                  text-sm
-                  ml-2
-                  text-gray-600
-                ">
+                  <span className="text-xl font-bold text-orange-600">
+                    ₹{order.total}
+                  </span>
 
-                  {order.id}
+                </div>
 
-                </span>
+                {/* Products */}
+                <div className="mt-5 border-t pt-4">
 
-              </h2>
+                  <h3 className="font-bold mb-3">
+                    Products
+                  </h3>
 
-
-
-
-
-              <p className="mt-3">
-
-                Status:
-
-                <span className="
-                  ml-2
-                  font-bold
-                  text-orange-600
-                ">
-
-                  {order.status || "Pending"}
-
-                </span>
-
-              </p>
-
-
-
-
-
-              <p className="
-                mt-2
-                font-bold
-              ">
-
-                Total:
-                ₹{order.total}
-
-              </p>
-
-
-
-
-
-              <p className="mt-2">
-
-                Delivery Address:
-
-                <span className="ml-2 text-gray-600">
-
-                  {order.address}
-
-                </span>
-
-              </p>
-
-
-
-
-
-              <h3 className="
-                font-bold
-                mt-5
-                mb-2
-              ">
-
-                Products
-
-              </h3>
-
-
-
-
-
-              {
-                (order.products || []).map(
-                  (item:any, index:number) => (
-
+                  {(order.products || []).map((item, index) => (
                     <div
-
                       key={index}
-
-                      className="
-                        border-b
-                        py-2
-                        flex
-                        justify-between
-                      "
-
+                      className="flex items-center justify-between py-3 border-b"
                     >
 
-                      <span>
+                      <div className="flex items-center gap-3">
 
-                        {item.name}
+                        {item.image ? (
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                            className="w-14 h-14 rounded-lg object-cover"
+                          />
+                        ) : (
+                          <div className="w-14 h-14 rounded-lg bg-gray-200 flex items-center justify-center">
+                            📦
+                          </div>
+                        )}
 
-                        <br />
+                        <div>
 
-                        Qty:
-                        {item.quantity || 1}
+                          <p className="font-semibold">
+                            {item.name}
+                          </p>
 
-                      </span>
+                          <p className="text-sm text-gray-500">
+                            Qty: {item.quantity}
+                          </p>
 
+                        </div>
 
+                      </div>
 
-                      <span className="font-bold">
-
-                        ₹
-                        {
-                          item.price *
-                          (item.quantity || 1)
-                        }
-
-                      </span>
-
+                      <p className="font-bold">
+                        ₹{item.price * item.quantity}
+                      </p>
 
                     </div>
+                  ))}
 
-                  )
-                )
+                </div>
 
-              }
+                {/* Buttons */}
+                <div className="mt-5">
+                  <Link
+                    href={`/orders/${order.id}`}
+                    className="block w-full bg-orange-500 text-white text-center py-3 rounded-xl font-semibold hover:bg-orange-600 transition"
+                  >
+                    🚚 Track Order
+                  </Link>
+                </div>
 
+              </div>
+            ))}
+          </div>
 
+        )}
 
-
-
-            </div>
-
-
-          ))
-
-
-        )
-
-      }
-
-
+      </div>
 
     </main>
-
   );
-
 }

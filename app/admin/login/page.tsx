@@ -65,8 +65,10 @@ export default function AdminLoginPage() {
         .from("profiles")
 
         .select("role")
-
         .eq("uuid", user.id)
+
+
+        
 
         .maybeSingle();
 

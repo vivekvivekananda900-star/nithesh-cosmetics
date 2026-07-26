@@ -126,6 +126,8 @@ description:item.description || "",
 
 
 
+
+
 image:
 item.images?.[0] ||
 item.image ||
@@ -143,7 +145,7 @@ Number(item.rating) || 4.8,
 
 
 deliveryFee:
-Number(item.deliveryFee) || 0,
+Number(item.deliveryfee) || 0,
 
 
 }));
