@@ -6,9 +6,7 @@ import { CartProvider } from "./context/CartContext";
 import FloatingWhatsApp from "@/components/FloatingWhatsApp";
 import BottomNavigation from "@/components/BottomNavigation";
 
-
 export const metadata: Metadata = {
-
   title: "Nithesh Cosmetics | Premium Beauty & Barber Products",
 
   description:
@@ -25,40 +23,32 @@ export const metadata: Metadata = {
   verification: {
     google: "pWtGfiF52iPtZYPNjLkqeGmXyDZrjIuB3SiGFpwASPA",
   },
-
 };
-
 
 export const viewport: Viewport = {
-
   width: "device-width",
-
   initialScale: 1,
-
   themeColor: "#f97316",
-
 };
-
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-
   return (
-
-    <html lang="en">
-
+    <html
+      lang="en"
+      suppressHydrationWarning
+    >
       <head>
         <meta
           name="color-scheme"
-          content="light"
+          content="light dark"
         />
       </head>
 
-
-      <body>
+      <body className="page">
 
         <CartProvider>
 
@@ -68,13 +58,9 @@ export default function RootLayout({
 
         </CartProvider>
 
-
         <FloatingWhatsApp />
 
       </body>
-
     </html>
-
   );
-
 }

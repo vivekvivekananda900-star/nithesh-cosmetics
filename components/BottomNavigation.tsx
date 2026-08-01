@@ -56,8 +56,8 @@ export default function BottomNavigation() {
     },
 
     {
-      name: "Profile",
-      href: "/profile",
+      name: "Account",
+      href: "/account",
       icon: User,
     },
 

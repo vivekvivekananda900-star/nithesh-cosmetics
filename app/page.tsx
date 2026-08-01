@@ -18,13 +18,18 @@ export default function Home() {
 
 
       <main className="
-        min-h-screen
-        bg-gradient-to-b
-        from-orange-50
-        via-orange-100
-        to-white
-        pb-24
-      ">
+  min-h-screen
+  bg-gradient-to-b
+  from-orange-50
+  via-orange-100
+  to-white
+  dark:from-gray-950
+  dark:via-gray-900
+  dark:to-black
+  text-gray-900
+  dark:text-white
+  pb-24
+">
 
 
 
@@ -39,6 +44,7 @@ export default function Home() {
 
           <div className="
             bg-white
+            dark:bg-gray-800
             rounded-3xl
             shadow-lg
             p-2
@@ -114,6 +120,7 @@ export default function Home() {
         key={index}
         className="
           bg-white
+          dark:bg-gray-800
           rounded-2xl sm:rounded-3xl
           shadow-md
           p-3 sm:p-5
@@ -122,6 +129,7 @@ export default function Home() {
           transition
           border
           border-orange-200
+          dark:border-gray-700
         "
       >
         <div className="text-3xl sm:text-4xl">
@@ -240,7 +248,9 @@ export default function Home() {
                 inline-block
                 mt-6
                 bg-white
+                dark:bg-gray-900
                 text-orange-600
+                dark:text-orange-400
                 font-bold
                 px-6 sm:px-8 py-2.5 sm:py-3
                 rounded-2xl

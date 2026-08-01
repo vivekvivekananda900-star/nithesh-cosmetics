@@ -96,7 +96,7 @@ export default function AccountPage() {
 
         {/* Profile Card */}
 
-        <Link href="/profile">
+        <Link href="/account">
 
         <div className="
         bg-white

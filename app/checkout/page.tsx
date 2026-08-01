@@ -1,307 +1,235 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useCart } from "@/app/context/CartContext";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import {
-  collection,
-  addDoc,
-  Timestamp,
-  doc,
-  getDoc,
-} from "firebase/firestore";
-
-import { db, auth } from "@/app/lib/firebase";
+import { supabase } from "@/app/lib/supabase";
+import { useCart } from "@/app/context/CartContext";
 import { generateInvoice } from "@/app/lib/generateInvoice";
 
+interface CartItem {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  image?: string;
+  deliveryFee?: number;
+}
 
 export default function CheckoutPage() {
-
-
-  const {
-    cart,
-    clearCart,
-  } = useCart();
-
-
   const router = useRouter();
 
+  const { cart, clearCart } = useCart();
 
-  const [name,setName] = useState("");
-  const [phone,setPhone] = useState("");
-  const [address,setAddress] = useState("");
+  const [loading, setLoading] = useState(false);
 
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
 
-
-  useEffect(()=>{
-
-    const loadProfile = async()=>{
-
-      const user = auth.currentUser;
-
-      if(!user) return;
+  const [paymentMethod, setPaymentMethod] =
+    useState("Cash on Delivery");
 
 
-      const snap = await getDoc(
-        doc(
-          db,
-          "users",
-          user.uid
-        )
-      );
+  const productTotal = cart.reduce(
+    (sum, item) =>
+      sum + item.price * item.quantity,
+    0
+  );
 
 
-      if(snap.exists()){
-
-        const data = snap.data();
-
-
-        setName(
-          data.name || ""
-        );
+  const deliveryFee = cart.reduce(
+    (sum, item) =>
+      sum + (item.deliveryFee || 0) * item.quantity,
+    0
+  );
 
 
-        setPhone(
-          data.phone || ""
-        );
+  const total = productTotal + deliveryFee;
 
 
-        setAddress(
-          data.address || ""
-        );
-
-      }
-
-    };
-
-
+  useEffect(() => {
     loadProfile();
+  }, []);
 
 
-  },[]);
+  async function loadProfile() {
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
 
+    if (!user) {
+      router.push("/login");
+      return;
+    }
 
 
-
-  const productTotal =
-    cart.reduce(
-      (sum,item)=>
-        sum +
-        item.price *
-        item.quantity,
-      0
-    );
+    const { data, error } =
+      await supabase
+        .from("profiles")
+        .select("*")
+        .eq("uuid", user.id)
+        .single();
 
 
+    if (error) {
+      console.log(error);
+      return;
+    }
 
 
+    setName(data.name || "");
+    setPhone(data.phone || "");
+    setAddress(data.address || "");
 
-  // Delivery fee from product
-  const deliveryFee =
-    cart.reduce(
-      (sum,item)=>
-        sum +
-        (item.deliveryFee || 0) *
-        item.quantity,
-      0
-    );
-
-
-
-
-
-  const total =
-    productTotal +
-    deliveryFee;
+  }
 
 
 
+  function getCurrentLocation() {
 
+    if (!navigator.geolocation) {
 
-
-
-  const getCurrentLocation = ()=>{
-
-
-    if(!navigator.geolocation){
-
-      alert(
-        "Location not supported"
-      );
-
+      alert("Location not supported");
       return;
 
     }
 
 
-
     navigator.geolocation.getCurrentPosition(
 
-      (position)=>{
-
+      (position) => {
 
         const lat =
           position.coords.latitude;
-
 
         const lng =
           position.coords.longitude;
 
 
-
-        const location =
-          `https://maps.google.com/?q=${lat},${lng}`;
-
-
-
-        setAddress(location);
-
-
-
-        alert(
-          "Current location added 📍"
+        setAddress(
+          `https://maps.google.com/?q=${lat},${lng}`
         );
-
 
       },
 
 
-      ()=>{
+      () => {
 
         alert(
-          "Please allow location permission"
+          "Please allow location permission."
         );
 
       }
 
     );
 
-
-  };
-
+  }
 
 
 
+  async function placeOrder() {
 
+    if (
+      !name.trim() ||
+      !phone.trim() ||
+      !address.trim()
+    ) {
 
-
-
-
-  const placeOrder = async()=>{
-
-
-    if(
-      !name ||
-      !phone ||
-      !address
-    ){
-
-      alert(
-        "Please fill all details"
-      );
-
+      alert("Please fill all details.");
       return;
 
     }
 
 
+    if (cart.length === 0) {
 
-
-    if(cart.length === 0){
-
-      alert(
-        "Cart is empty"
-      );
-
+      alert("Your cart is empty.");
       return;
 
     }
 
 
+    setLoading(true);
+
+
+    try {
+
+
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
 
 
-    try{
+      if (!user) {
 
+        alert("Please login first.");
+        router.push("/login");
+        return;
 
-      const user =
-        auth.currentUser;
-
-
-
-
-      const orderRef =
-        await addDoc(
-
-          collection(
-            db,
-            "orders"
-          ),
-
-          {
-
-            userId:
-              user?.uid || "",
-
-
-            customerName:
-              name,
-
-
-            phone,
-
-
-            address,
+      }
 
 
 
-            products:
-              cart,
+      const { data, error } =
+        await supabase
+          .from("orders")
+          .insert([
+            {
+
+              user_id: user.id,
+
+              customer_name: name,
+
+              phone,
+
+              address,
+
+              products: cart,
+
+              product_total: productTotal,
+
+              delivery_fee: deliveryFee,
+
+              total,
+
+              payment_method: paymentMethod,
+
+              payment_status: "Pending",
+
+              status: "Pending",
+
+            },
+
+          ])
+          .select()
+          .single();
 
 
 
-            productTotal,
+      if (error) {
+
+        console.log(error);
+
+        alert(error.message);
+
+        return;
+
+      }
 
 
-
-            deliveryFee,
-
-
-
-            total,
-
-
-
-            status:
-              "Pending",
-
-
-
-            createdAt:
-              Timestamp.now()
-
-          }
-
-        );
-
-
-
-
-
-
-
-      // Generate Invoice with Delivery Fee
 
       generateInvoice(
 
-        orderRef.id,
+        data.id,
 
         {
           name,
           phone,
-          address
+          address,
         },
 
         cart,
@@ -316,76 +244,53 @@ export default function CheckoutPage() {
 
 
 
-
-
-
-
-
       let message =
-`🛒 *Nithesh Cosmetics Order*
+`🛍️ *Nithesh Cosmetics*
 
-🧾 Order ID:
-${orderRef.id}
+🆔 Order ID: ${data.id}
 
-👤 Name:
-${name}
+👤 Name: ${name}
 
-📱 Phone:
-${phone}
+📞 Phone: ${phone}
 
 📍 Address:
 ${address}
 
+----------------------
 
-📦 Products:
 `;
 
 
-
-
-      cart.forEach((item)=>{
-
+      cart.forEach((item) => {
 
         message +=
-`
-${item.name}
+`${item.name}
 
-Qty:
-${item.quantity}
+Qty : ${item.quantity}
 
-Price:
-₹${item.price}
+Price : ₹${item.price}
+
+----------------------
 
 `;
 
       });
-
-
-
-
-
       message +=
-`
-📦 Product Total:
-₹${productTotal}
+`Product Total : ₹${productTotal}
 
-🚚 Delivery Fee:
-₹${deliveryFee}
+Delivery Fee : ₹${deliveryFee}
 
-💰 Total:
-₹${total}
+Grand Total : ₹${total}
 
-Thank you 🙏`;
+Payment : ${paymentMethod}
 
-
-
-
-
+Thank You ❤️`;
 
 
       const whatsappURL =
-`https://wa.me/919676578296?text=${encodeURIComponent(message)}`;
-
+        `https://wa.me/919676578296?text=${encodeURIComponent(
+          message
+        )}`;
 
 
       window.open(
@@ -394,237 +299,332 @@ Thank you 🙏`;
       );
 
 
-
-
-
       clearCart();
 
 
-
       router.push(
-        `/order-success?orderId=${orderRef.id}`
+        `/order-success?orderId=${data.id}`
       );
 
 
+    } catch (error) {
 
-    }
-    catch(error){
-
-
-      console.log(error);
-
+      console.error(error);
 
       alert(
-        "Order failed"
+        "Something went wrong while placing order."
       );
 
 
+    } finally {
+
+      setLoading(false);
+
     }
 
-
-  };
-
-
-
-
+  }
 
 
 
   return (
 
-    <main className="max-w-6xl mx-auto p-6">
+    <main className="min-h-screen bg-gray-50">
+
+      <div className="max-w-7xl mx-auto px-4 py-8">
 
 
-      <h1 className="text-4xl font-bold mb-8">
-        Checkout 🛒
-      </h1>
-
-
-
-
-      <div className="grid md:grid-cols-2 gap-8">
+        <h1 className="text-4xl font-bold mb-8 text-center">
+          Checkout 🛒
+        </h1>
 
 
 
-        <div className="space-y-4">
-
-
-          <input
-            value={name}
-            onChange={(e)=>setName(e.target.value)}
-            placeholder="Full Name"
-            className="w-full border p-3 rounded-lg"
-          />
+        <div className="grid lg:grid-cols-2 gap-8">
 
 
 
-          <input
-            value={phone}
-            onChange={(e)=>setPhone(e.target.value)}
-            placeholder="Phone Number"
-            className="w-full border p-3 rounded-lg"
-          />
+          {/* Customer Details */}
+
+          <div className="bg-white rounded-2xl shadow-lg p-6">
+
+
+            <h2 className="text-2xl font-bold mb-6">
+              Customer Details
+            </h2>
 
 
 
-          <button
-            onClick={getCurrentLocation}
-            className="
-            w-full
-            bg-blue-600
-            text-white
-            py-3
-            rounded-lg
-            font-bold
-            "
-          >
+            <input
 
-            📍 Use Current Location
+              className="w-full border rounded-lg p-3 mb-4"
 
-          </button>
+              placeholder="Full Name"
+
+              value={name}
+
+              onChange={(e)=>setName(e.target.value)}
+
+            />
 
 
 
+            <input
 
-          <textarea
+              className="w-full border rounded-lg p-3 mb-4"
 
-            value={address}
+              placeholder="Phone Number"
 
-            onChange={(e)=>setAddress(e.target.value)}
+              value={phone}
 
-            placeholder="Delivery Address"
+              onChange={(e)=>setPhone(e.target.value)}
 
-            className="
-            w-full
-            border
-            p-3
-            rounded-lg
-            h-32
-            "
-
-          />
-
-
-        </div>
+            />
 
 
 
+            <textarea
+
+              className="w-full border rounded-lg p-3 h-32 mb-4"
+
+              placeholder="Delivery Address"
+
+              value={address}
+
+              onChange={(e)=>setAddress(e.target.value)}
+
+            />
 
 
 
-        <div className="border rounded-xl p-6">
+            <button
 
+              onClick={getCurrentLocation}
 
-          <h2 className="text-2xl font-bold mb-5">
-            Order Summary
-          </h2>
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg font-bold"
 
-
-
-
-          {cart.map((item)=>(
-
-
-            <div
-              key={item.id}
-              className="
-              flex
-              justify-between
-              border-b
-              py-3
-              "
             >
 
-              <span>
+              📍 Use Current Location
 
-                {item.name}
-
-                <br/>
-
-                Qty: {item.quantity}
-
-              </span>
+            </button>
 
 
-              <b>
-                ₹{item.price * item.quantity}
-              </b>
+
+
+            <h2 className="text-xl font-bold mt-8 mb-4">
+
+              Payment Method
+
+            </h2>
+
+
+
+
+            <select
+
+              value={paymentMethod}
+
+              onChange={(e)=>setPaymentMethod(e.target.value)}
+
+              className="w-full border rounded-lg p-3"
+
+            >
+
+              <option>
+                Cash on Delivery
+              </option>
+
+              <option>
+                UPI
+              </option>
+
+              <option>
+                PhonePe
+              </option>
+
+              <option>
+                Google Pay
+              </option>
+
+              <option>
+                Paytm
+              </option>
+
+            </select>
+
+
+
+          </div>
+
+
+
+
+
+          {/* Order Summary */}
+
+
+          <div className="bg-white rounded-2xl shadow-lg p-6">
+
+
+            <h2 className="text-2xl font-bold mb-6">
+
+              Order Summary
+
+            </h2>
+
+
+
+
+            <div className="space-y-4">
+
+
+              {cart.map((item)=> (
+
+                <div
+
+                  key={item.id}
+
+                  className="flex justify-between border-b pb-3"
+
+                >
+
+
+                  <div>
+
+                    <p className="font-semibold">
+                      {item.name}
+                    </p>
+
+
+                    <p className="text-gray-500">
+                      Qty : {item.quantity}
+                    </p>
+
+
+                  </div>
+
+
+
+                  <p className="font-bold">
+
+                    ₹{item.price * item.quantity}
+
+                  </p>
+
+
+                </div>
+
+              ))}
 
 
             </div>
 
 
-          ))}
+
+
+            <hr className="my-6"/>
 
 
 
 
+            <div className="flex justify-between mb-3">
 
-          <p className="mt-4">
-            Products:
-            ₹{productTotal}
-          </p>
-
-
+              <span>
+                Products Total
+              </span>
 
 
-          <p>
-            Delivery:
-            {
-              deliveryFee === 0
-              ? "Free"
-              : `₹${deliveryFee}`
-            }
-          </p>
+              <b>
+                ₹{productTotal}
+              </b>
+
+            </div>
 
 
 
 
+            <div className="flex justify-between mb-3">
 
-          <h2 className="text-3xl font-bold mt-5">
-
-            Total:
-            ₹{total}
-
-          </h2>
+              <span>
+                Delivery Fee
+              </span>
 
 
+              <b>
+
+                {
+                  deliveryFee === 0
+                  ? "Free"
+                  : `₹${deliveryFee}`
+                }
+
+              </b>
+
+            </div>
 
 
 
-          <button
 
-            onClick={placeOrder}
+            <div className="flex justify-between text-2xl font-bold mt-5">
 
-            className="
-            mt-6
-            w-full
-            bg-green-600
-            text-white
-            py-3
-            rounded-lg
-            font-bold
-            "
+              <span>
+                Grand Total
+              </span>
 
-          >
 
-            Place Order 📲
+              <span>
+                ₹{total}
+              </span>
 
-          </button>
+
+            </div>
+
+
+
+
+            <button
+
+              disabled={loading}
+
+              onClick={placeOrder}
+
+              className="mt-8 w-full bg-green-600 hover:bg-green-700 text-white rounded-xl py-4 text-lg font-bold disabled:opacity-50"
+
+            >
+
+              {
+                loading
+                ?
+                "Placing Order..."
+                :
+                "Place Order 🛍️"
+              }
+
+
+            </button>
+
+
+
+            <p className="text-center text-sm text-gray-500 mt-4">
+
+              Your order is securely processed and will appear in your account after confirmation.
+
+            </p>
+
+
+
+          </div>
 
 
 
         </div>
 
 
-
       </div>
-
 
 
     </main>
 
   );
-
 
 }

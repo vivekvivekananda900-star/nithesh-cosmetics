@@ -1,126 +1,197 @@
 @import "tailwindcss";
 
+/* =========================
+   Theme Variables
+========================= */
 
 :root {
-
   --background: #fff7ed;
   --foreground: #1f2937;
 
-  --primary: #f97316;
-
   --card: #ffffff;
+  --card-hover: #f9fafb;
 
   --border: #fed7aa;
 
+  --primary: #f97316;
+  --primary-hover: #ea580c;
+
+  --secondary: #f3f4f6;
+
+  --muted: #6b7280;
 }
-
-
 
 @media (prefers-color-scheme: dark) {
-
   :root {
-
-    --background: #111827;
-
+    --background: #0f172a;
     --foreground: #f9fafb;
 
+    --card: #1e293b;
+    --card-hover: #334155;
+
+    --border: #475569;
+
     --primary: #fb923c;
+    --primary-hover: #f97316;
 
-    --card: #1f2937;
+    --secondary: #1f2937;
 
-    --border: #374151;
-
+    --muted: #cbd5e1;
   }
-
 }
 
-
-
 @theme inline {
-
   --color-background: var(--background);
-
   --color-foreground: var(--foreground);
-
-  --color-primary: var(--primary);
 
   --color-card: var(--card);
 
   --color-border: var(--border);
 
+  --color-primary: var(--primary);
+
   --font-sans: var(--font-geist-sans);
-
   --font-mono: var(--font-geist-mono);
-
 }
 
+/* =========================
+   Base
+========================= */
 
+* {
+  box-sizing: border-box;
+}
 
-/* Global Mobile Fix */
+html {
+  scroll-behavior: smooth;
+}
 
 html,
 body {
-
   width: 100%;
-
   max-width: 100%;
-
   overflow-x: hidden;
-
 }
-
-
-
-* {
-
-  box-sizing: border-box;
-
-}
-
-
 
 body {
+  margin: 0;
+  padding: 0;
 
   background: var(--background);
-
   color: var(--foreground);
 
   font-family: Arial, Helvetica, sans-serif;
 
-  margin: 0;
-
-  padding: 0;
-
+  transition:
+    background-color .3s ease,
+    color .3s ease;
 }
-
-
-
-/* Smooth mobile scrolling */
-
-html {
-
-  scroll-behavior: smooth;
-
-}
-
-
-
-/* Prevent images causing overflow */
 
 img {
-
   max-width: 100%;
-
   height: auto;
-
 }
 
-
-
-/* Safe area for mobile bottom navigation */
-
 .pb-safe {
-
   padding-bottom: env(safe-area-inset-bottom);
+}
 
+/* =========================
+   Reusable Classes
+========================= */
+
+.page {
+  min-height: 100vh;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.container-custom {
+  max-width: 1280px;
+  margin: auto;
+  padding: 16px;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 24px;
+  transition: .3s;
+}
+
+.card:hover {
+  background: var(--card-hover);
+}
+
+.heading {
+  font-weight: 700;
+  color: var(--foreground);
+}
+
+.text-muted {
+  color: var(--muted);
+}
+
+.input {
+  width: 100%;
+  padding: 12px;
+
+  border-radius: 10px;
+  border: 1px solid var(--border);
+
+  background: var(--card);
+  color: var(--foreground);
+
+  outline: none;
+}
+
+.input:focus {
+  border-color: var(--primary);
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+
+  border: none;
+  border-radius: 10px;
+
+  padding: 12px 20px;
+
+  cursor: pointer;
+
+  transition: .3s;
+}
+
+.btn-primary:hover {
+  background: var(--primary-hover);
+}
+
+.btn-success {
+  background: #16a34a;
+  color: white;
+
+  border: none;
+
+  border-radius: 10px;
+
+  padding: 12px 20px;
+
+  cursor: pointer;
+}
+
+.btn-success:hover {
+  background: #15803d;
+}
+
+.section-title {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.shadow-card {
+  box-shadow:
+    0 10px 20px rgba(0,0,0,.08);
 }

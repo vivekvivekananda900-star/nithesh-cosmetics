@@ -39,6 +39,7 @@ export default function Navbar() {
         w-full
         overflow-hidden
         bg-orange-500
+        dark:bg-gray-900
         text-white
         shadow-lg
       ">
@@ -118,7 +119,10 @@ export default function Navbar() {
               h-9
               rounded-full
               bg-white
+              dark:bg-gray-800
               text-orange-500
+              
+              dark:text-orange-400
               flex
               items-center
               justify-center
@@ -140,13 +144,16 @@ export default function Navbar() {
 
 
           <div className="
-            bg-white
-            rounded-2xl
-            p-3
-            sm:p-4
-            text-black
-            shadow
+           
             w-full
+            bg-white
+            dark:bg-gray-800
+rounded-2xl
+p-3
+sm:p-4
+text-black
+dark:text-white
+shadow 
           ">
 
 
