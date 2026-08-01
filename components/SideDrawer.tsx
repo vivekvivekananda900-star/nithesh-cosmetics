@@ -14,7 +14,7 @@ const menuItems = [
   { name: "Products", href: "/products", icon: ShoppingBag },
   { name: "Categories", href: "/products", icon: Grid2x2 },
   { name: "Wishlist", href: "/wishlist", icon: Heart },
-  { name: "Orders", href: "/track-order", icon: PackageCheck },
+  { name: "Orders", href: "/orders", icon: PackageCheck },
   { name: "My Account", href: "/account", icon: User },
   { name: "Contact", href: "/contact", icon: Phone },
 ];
