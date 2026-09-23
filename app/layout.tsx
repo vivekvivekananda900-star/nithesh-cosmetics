@@ -1,13 +1,22 @@
-import type { Metadata, Viewport } from "next";
+import type {
+  Metadata,
+  Viewport,
+} from "next";
+
 import "./globals.css";
 
 import { CartProvider } from "./context/CartContext";
 
 import FloatingWhatsApp from "@/components/FloatingWhatsApp";
-import BottomNavigation from "@/components/BottomNavigation";
+import AppNavigation from "@/components/AppNavigation";
 
 export const metadata: Metadata = {
-  title: "Nithesh Cosmetics | Premium Beauty & Barber Products",
+  title: {
+    default:
+      "Nithesh Cosmetics | Premium Beauty & Barber Products",
+    template:
+      "%s | Nithesh Cosmetics",
+  },
 
   description:
     "Shop premium cosmetics, professional barber tools, skincare and beauty products at Nithesh Cosmetics.",
@@ -18,16 +27,25 @@ export const metadata: Metadata = {
     "Cosmetics Store",
     "Beauty Products",
     "Salon Accessories",
+    "Professional Barber Tools",
+    "Skincare Products",
   ],
 
   verification: {
-    google: "pWtGfiF52iPtZYPNjLkqeGmXyDZrjIuB3SiGFpwASPA",
+    google:
+      "pWtGfiF52iPtZYPNjLkqeGmXyDZrjIuB3SiGFpwASPA",
+  },
+
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  maximumScale: 5,
   themeColor: "#f97316",
 };
 
@@ -41,20 +59,22 @@ export default function RootLayout({
       lang="en"
       suppressHydrationWarning
     >
-      <head>
-        <meta
-          name="color-scheme"
-          content="light dark"
-        />
-      </head>
-
-      <body className="page">
-
+      <body
+        className="
+          min-h-screen
+          overflow-x-hidden
+          bg-white
+          text-gray-900
+          antialiased
+          selection:bg-orange-200
+          selection:text-orange-950
+        "
+      >
         <CartProvider>
 
           {children}
 
-          <BottomNavigation />
+          <AppNavigation />
 
         </CartProvider>
 

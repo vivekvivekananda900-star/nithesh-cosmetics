@@ -3,10 +3,9 @@
 import {
   createContext,
   useContext,
-  useState,
   useEffect,
+  useState,
 } from "react";
-
 
 interface Product {
   id: string;
@@ -18,12 +17,10 @@ interface Product {
   deliveryFee?: number;
 }
 
-
 interface CartItem extends Product {
   deliveryFee: number;
   quantity: number;
 }
-
 
 interface CartContextType {
   cart: CartItem[];
@@ -34,285 +31,199 @@ interface CartContextType {
   clearCart: () => void;
 }
 
-
 const CartContext =
   createContext<CartContextType | null>(null);
-
-
 
 export function CartProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
-
-
   const [cart, setCart] =
     useState<CartItem[]>([]);
 
+  const [hydrated, setHydrated] =
+    useState(false);
 
+  /* =========================
+     LOAD CART
+  ========================= */
 
-  // Load cart from localStorage
   useEffect(() => {
+    try {
+      const savedCart =
+        localStorage.getItem("cart");
 
-    const savedCart =
-      localStorage.getItem("cart");
+      if (savedCart) {
+        const parsedCart =
+          JSON.parse(savedCart);
 
-
-    if (savedCart) {
-
-      setCart(
-        JSON.parse(savedCart)
+        if (Array.isArray(parsedCart)) {
+          setCart(parsedCart);
+        }
+      }
+    } catch (error) {
+      console.error(
+        "Failed to load cart:",
+        error
       );
-
+    } finally {
+      setHydrated(true);
     }
-
   }, []);
 
+  /* =========================
+     SAVE CART
+  ========================= */
 
-
-
-
-  // Save cart
   useEffect(() => {
+    if (!hydrated) return;
 
-    localStorage.setItem(
-      "cart",
-      JSON.stringify(cart)
-    );
+    try {
+      localStorage.setItem(
+        "cart",
+        JSON.stringify(cart)
+      );
+    } catch (error) {
+      console.error(
+        "Failed to save cart:",
+        error
+      );
+    }
+  }, [cart, hydrated]);
 
-  }, [cart]);
+  /* =========================
+     ADD TO CART
+  ========================= */
 
-
-
-
-
-
-  // Add To Cart
   const addToCart = (
     product: Product
   ) => {
-
-
     setCart((prev) => {
-
-
       const existing =
         prev.find(
           (item) =>
             item.id === product.id
         );
 
-
-
       if (existing) {
-
-        return prev.map(
-          (item) =>
-
-            item.id === product.id
-
-              ? {
-                  ...item,
-                  quantity:
-                    item.quantity + 1,
-                }
-
-              : item
+        return prev.map((item) =>
+          item.id === product.id
+            ? {
+                ...item,
+                quantity:
+                  item.quantity + 1,
+              }
+            : item
         );
-
       }
 
-
-
       return [
-
         ...prev,
-
         {
           ...product,
-
           deliveryFee:
-            product.deliveryFee || 0,
-
+            product.deliveryFee ?? 0,
           quantity: 1,
         },
-
       ];
-
-
     });
-
-
   };
 
+  /* =========================
+     REMOVE ITEM
+  ========================= */
 
-
-
-
-
-
-  // Remove item
   const removeFromCart = (
     id: string
   ) => {
-
     setCart((prev) =>
       prev.filter(
         (item) =>
           item.id !== id
       )
     );
-
   };
 
+  /* =========================
+     INCREASE QUANTITY
+  ========================= */
 
-
-
-
-
-
-  // Increase quantity
   const increaseQuantity = (
     id: string
   ) => {
-
     setCart((prev) =>
-
-      prev.map(
-        (item) =>
-
-          item.id === id
-
-            ? {
-                ...item,
-                quantity:
-                  item.quantity + 1,
-              }
-
-            : item
-
+      prev.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              quantity:
+                item.quantity + 1,
+            }
+          : item
       )
-
     );
-
   };
 
+  /* =========================
+     DECREASE QUANTITY
+  ========================= */
 
-
-
-
-
-
-  // Decrease quantity
   const decreaseQuantity = (
     id: string
   ) => {
-
     setCart((prev) =>
-
       prev
-
-      .map(
-        (item) =>
-
+        .map((item) =>
           item.id === id
-
             ? {
                 ...item,
                 quantity:
                   item.quantity - 1,
               }
-
             : item
-
-      )
-
-      .filter(
-        (item) =>
-          item.quantity > 0
-      )
-
+        )
+        .filter(
+          (item) =>
+            item.quantity > 0
+        )
     );
-
   };
 
+  /* =========================
+     CLEAR CART
+  ========================= */
 
-
-
-
-
-
-  // Clear Cart
   const clearCart = () => {
-
     setCart([]);
-
-    localStorage.removeItem(
-      "cart"
-    );
-
+    localStorage.removeItem("cart");
   };
-
-
-
-
-
-
 
   return (
-
     <CartContext.Provider
-
       value={{
-
         cart,
-
         addToCart,
-
         removeFromCart,
-
         increaseQuantity,
-
         decreaseQuantity,
-
         clearCart,
-
       }}
-
     >
-
       {children}
-
     </CartContext.Provider>
-
   );
-
 }
 
-
-
-
-
-
-
 export function useCart() {
-
-
   const context =
     useContext(CartContext);
 
-
-
   if (!context) {
-
     throw new Error(
       "useCart must be used inside CartProvider"
     );
-
   }
 
-
   return context;
-
 }

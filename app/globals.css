@@ -83,8 +83,8 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 
   transition:
-    background-color .3s ease,
-    color .3s ease;
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 
 img {
@@ -117,11 +117,18 @@ img {
   border: 1px solid var(--border);
   border-radius: 18px;
   padding: 24px;
-  transition: .3s;
+
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease,
+    background-color 0.3s ease;
 }
 
 .card:hover {
   background: var(--card-hover);
+  transform: translateY(-4px);
+  box-shadow:
+    0 14px 35px rgba(249, 115, 22, 0.12);
 }
 
 .heading {
@@ -144,10 +151,17 @@ img {
   color: var(--foreground);
 
   outline: none;
+
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
 }
 
 .input:focus {
   border-color: var(--primary);
+
+  box-shadow:
+    0 0 0 4px rgba(249, 115, 22, 0.1);
 }
 
 .btn-primary {
@@ -161,11 +175,23 @@ img {
 
   cursor: pointer;
 
-  transition: .3s;
+  transition:
+    transform 0.25s ease,
+    background-color 0.25s ease,
+    box-shadow 0.25s ease;
 }
 
 .btn-primary:hover {
   background: var(--primary-hover);
+
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 10px 25px rgba(249, 115, 22, 0.25);
+}
+
+.btn-primary:active {
+  transform: scale(0.97);
 }
 
 .btn-success {
@@ -179,10 +205,19 @@ img {
   padding: 12px 20px;
 
   cursor: pointer;
+
+  transition:
+    transform 0.25s ease,
+    background-color 0.25s ease;
 }
 
 .btn-success:hover {
   background: #15803d;
+  transform: translateY(-2px);
+}
+
+.btn-success:active {
+  transform: scale(0.97);
 }
 
 .section-title {
@@ -193,5 +228,235 @@ img {
 
 .shadow-card {
   box-shadow:
-    0 10px 20px rgba(0,0,0,.08);
+    0 10px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* ==========================================
+   HOME PAGE PREMIUM ANIMATIONS
+========================================== */
+
+/* Fade + Slide Up */
+
+@keyframes homeReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(28px) scale(0.98);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Floating */
+
+@keyframes homeFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+/* Slower Floating */
+
+@keyframes homeFloatSlow {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-6px) rotate(3deg);
+  }
+}
+
+/* Background Glow */
+
+@keyframes homeGlow {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.65;
+    transform: scale(1.12);
+  }
+}
+
+/* Decorative Circle */
+
+@keyframes homeFloatingCircle {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  50% {
+    transform: translate(18px, 15px) scale(1.08);
+  }
+}
+
+/* Reverse Decorative Circle */
+
+@keyframes homeFloatingCircleReverse {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  50% {
+    transform: translate(-18px, -12px) scale(1.1);
+  }
+}
+
+/* Small Pulse */
+
+@keyframes homeSoftPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.04);
+  }
+}
+
+/* =========================
+   Animation Classes
+========================= */
+
+.home-reveal {
+  opacity: 0;
+
+  animation:
+    homeReveal 0.7s
+    cubic-bezier(0.16, 1, 0.3, 1)
+    forwards;
+}
+
+.home-float {
+  animation:
+    homeFloat 3.8s
+    ease-in-out
+    infinite;
+}
+
+.home-float-slow {
+  animation:
+    homeFloatSlow 5s
+    ease-in-out
+    infinite;
+}
+
+.home-glow {
+  animation:
+    homeGlow 6s
+    ease-in-out
+    infinite;
+}
+
+.home-floating-circle {
+  animation:
+    homeFloatingCircle 7s
+    ease-in-out
+    infinite;
+}
+
+.home-floating-circle-reverse {
+  animation:
+    homeFloatingCircleReverse 8s
+    ease-in-out
+    infinite;
+}
+
+.home-soft-pulse {
+  animation:
+    homeSoftPulse 3s
+    ease-in-out
+    infinite;
+}
+
+/* =========================
+   Animation Delays
+========================= */
+
+.home-delay-1 {
+  animation-delay: 0.08s;
+}
+
+.home-delay-2 {
+  animation-delay: 0.16s;
+}
+
+.home-delay-3 {
+  animation-delay: 0.24s;
+}
+
+.home-delay-4 {
+  animation-delay: 0.32s;
+}
+
+.home-delay-5 {
+  animation-delay: 0.4s;
+}
+
+.home-delay-6 {
+  animation-delay: 0.48s;
+}
+
+.home-delay-7 {
+  animation-delay: 0.56s;
+}
+
+/* =========================
+   Smooth Product / Card Hover
+========================= */
+
+.premium-hover {
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.premium-hover:hover {
+  transform: translateY(-6px) scale(1.01);
+
+  box-shadow:
+    0 18px 45px rgba(249, 115, 22, 0.12);
+}
+
+/* =========================
+   Accessibility
+========================= */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .home-reveal,
+  .home-float,
+  .home-float-slow,
+  .home-glow,
+  .home-floating-circle,
+  .home-floating-circle-reverse,
+  .home-soft-pulse {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+  }
 }

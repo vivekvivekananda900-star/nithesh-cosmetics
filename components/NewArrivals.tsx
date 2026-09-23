@@ -2,136 +2,292 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Star, Heart } from "lucide-react";
+
 import { supabase } from "@/app/lib/supabase";
 
-type Product = {
+interface Product {
   id: string;
   name: string;
   price: number;
+  mrp?: number;
+  discount?: number;
   image?: string;
-  images?: string[];
-};
+  category?: string;
+}
 
 export default function NewArrivals() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchProducts();
-  }, []);
+    async function loadNewArrivals() {
+      try {
+        const { data, error } = await supabase
+          .from("products")
+          .select(
+            "id,name,price,mrp,discount,image,category,created_at"
+          )
+          .eq("active", true)
+          .order("created_at", {
+            ascending: false,
+          })
+          .limit(6);
 
-  async function fetchProducts() {
-    const { data, error } = await supabase
-      .from("products")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(6);
+        if (error) {
+          throw error;
+        }
 
-    if (error) {
-      console.error(error);
-      return;
+        const list: Product[] =
+          data?.map((item) => ({
+            id: item.id,
+            name: item.name || "",
+            price: Number(item.price) || 0,
+            mrp: Number(item.mrp) || 0,
+            discount: Number(item.discount) || 0,
+            image:
+              item.image ||
+              "/placeholder.png",
+            category:
+              item.category || "",
+          })) || [];
+
+        setProducts(list);
+      } catch (error) {
+        console.error(
+          "New arrivals loading error:",
+          error
+        );
+      } finally {
+        setLoading(false);
+      }
     }
 
-    const formatted =
-      (data || []).map((item: any) => ({
-        ...item,
-        image:
-          item.images?.[0] ||
-          item.image ||
-          "/placeholder.png",
-      }));
+    loadNewArrivals();
+  }, []);
 
-    setProducts(formatted);
-  }
-
-  return (
-    <section className="px-3 sm:px-4 py-8">
-      <div className="flex items-center justify-between mb-5">
-
-        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">
+  if (loading) {
+    return (
+      <section className="px-4 mt-10">
+        <h2 className="text-2xl font-bold mb-4">
           ✨ New Arrivals
         </h2>
 
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          {[1, 2, 3, 4, 5, 6].map(
+            (item) => (
+              <div
+                key={item}
+                className="
+                  bg-white
+                  rounded-2xl
+                  shadow
+                  p-4
+                  animate-pulse
+                "
+              >
+                <div className="h-36 bg-gray-200 rounded-xl" />
+
+                <div className="h-4 bg-gray-200 rounded mt-4" />
+
+                <div className="h-4 bg-gray-200 rounded mt-2 w-20" />
+              </div>
+            )
+          )}
+        </div>
+      </section>
+    );
+  }
+
+  if (products.length === 0) {
+    return null;
+  }
+
+  return (
+    <section className="px-4 mt-10">
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h2 className="text-2xl font-bold">
+            ✨ New Arrivals
+          </h2>
+
+          <p className="text-sm text-gray-500 mt-1">
+            Fresh products just added
+          </p>
+        </div>
+
         <Link
           href="/products"
-          className="text-orange-600 font-semibold text-sm sm:text-base"
+          className="
+            text-orange-600
+            font-semibold
+            hover:text-orange-700
+            transition
+          "
         >
           View All →
         </Link>
-
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
-
+      <div
+        className="
+          grid
+          grid-cols-2
+          md:grid-cols-3
+          lg:grid-cols-6
+          gap-4
+        "
+      >
         {products.map((product) => (
-
           <Link
             key={product.id}
             href={`/products/${product.id}`}
-            className="bg-white rounded-2xl sm:rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition duration-300"
+            className="
+              bg-white
+              rounded-2xl
+              shadow
+              p-4
+              hover:shadow-xl
+              transition
+              overflow-hidden
+              relative
+            "
           >
+            {/* NEW BADGE */}
 
-            <div className="relative overflow-hidden">
+            <div
+              className="
+                absolute
+                top-2
+                left-2
+                z-10
+                bg-orange-500
+                text-white
+                text-xs
+                font-bold
+                px-2
+                py-1
+                rounded-full
+              "
+            >
+              NEW
+            </div>
 
+            {/* PRODUCT IMAGE */}
+
+            <div
+              className="
+                h-36
+                w-full
+                rounded-xl
+                bg-gray-50
+                overflow-hidden
+                flex
+                items-center
+                justify-center
+              "
+            >
               <img
-                src={product.image || "/placeholder.png"}
+                src={
+                  product.image ||
+                  "/placeholder.png"
+                }
                 alt={product.name}
-                className="w-full h-36 sm:h-48 md:h-56 object-cover hover:scale-105 transition duration-300"
+                onError={(e) => {
+                  e.currentTarget.onerror =
+                    null;
+
+                  e.currentTarget.src =
+                    "/placeholder.png";
+                }}
+                className="
+                  w-full
+                  h-full
+                  object-contain
+                  p-2
+                "
               />
+            </div>
 
-              <span className="absolute top-2 left-2 bg-orange-500 text-white text-[10px] sm:text-xs px-2 sm:px-3 py-1 rounded-full font-semibold">
-                NEW
-              </span>
+            {/* PRODUCT NAME */}
 
-              <button
-                className="absolute top-2 right-2 bg-white p-2 rounded-full shadow-md"
-                onClick={(e) => e.preventDefault()}
+            <h3
+              className="
+                mt-3
+                font-semibold
+                line-clamp-2
+                min-h-[48px]
+              "
+            >
+              {product.name}
+            </h3>
+
+            {/* CATEGORY */}
+
+            {product.category && (
+              <p
+                className="
+                  text-xs
+                  text-gray-500
+                  mt-1
+                "
               >
-                <Heart
-                  size={16}
-                  className="text-gray-500 hover:text-red-500 transition"
-                />
-              </button>
+                {product.category}
+              </p>
+            )}
 
+            {/* PRICE */}
+
+            <div
+              className="
+                flex
+                items-center
+                gap-2
+                mt-2
+                flex-wrap
+              "
+            >
+              <p
+                className="
+                  text-orange-600
+                  font-bold
+                  text-lg
+                "
+              >
+                ₹{product.price}
+              </p>
+
+              {product.mrp &&
+                product.mrp >
+                  product.price && (
+                  <p
+                    className="
+                      text-sm
+                      text-gray-400
+                      line-through
+                    "
+                  >
+                    ₹{product.mrp}
+                  </p>
+                )}
             </div>
 
-            <div className="p-3 sm:p-4">
+            {/* DISCOUNT */}
 
-              <h3 className="font-semibold text-sm sm:text-base line-clamp-2 min-h-[40px]">
-                {product.name}
-              </h3>
-
-              <div className="flex items-center mt-2">
-
-                <Star
-                  size={14}
-                  className="fill-yellow-400 text-yellow-400"
-                />
-
-                <span className="ml-1 text-xs sm:text-sm font-medium">
-                  4.9
-                </span>
-
-              </div>
-
-              <div className="mt-3 flex items-center gap-2 flex-wrap">
-
-                <span className="text-lg sm:text-xl font-bold text-green-600">
-                  ₹{product.price}
-                </span>
-
-                <span className="text-xs sm:text-sm line-through text-gray-400">
-                  ₹{Math.round(product.price * 1.2)}
-                </span>
-
-              </div>
-
-            </div>
-
+            {product.discount ? (
+              <p
+                className="
+                  text-green-600
+                  text-sm
+                  font-semibold
+                  mt-1
+                "
+              >
+                Save ₹
+                {product.discount}
+              </p>
+            ) : null}
           </Link>
-
         ))}
-
       </div>
     </section>
   );

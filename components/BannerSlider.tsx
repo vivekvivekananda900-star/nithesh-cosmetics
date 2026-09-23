@@ -1,252 +1,168 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay, Pagination } from "swiper/modules";
+import {
+  Swiper,
+  SwiperSlide,
+} from "swiper/react";
+
+import {
+  Autoplay,
+} from "swiper/modules";
 
 import { supabase } from "@/app/lib/supabase";
 
 import "swiper/css";
-import "swiper/css/pagination";
 
-
-interface Banner {
+type Banner = {
   id: string;
-  title: string;
-  subtitle: string;
   image: string;
-}
-
+};
 
 export default function BannerSlider() {
-
-  const [banners, setBanners] = useState<Banner[]>([]);
-
+  const [banners, setBanners] =
+    useState<Banner[]>([]);
 
   useEffect(() => {
-
     loadBanners();
-
   }, []);
 
-
-
   async function loadBanners() {
-
-    const { data, error } = await supabase
+    const {
+      data,
+      error,
+    } = await supabase
       .from("banners")
-      .select("*")
-      .order("created_at", { ascending: false });
-
+      .select("id,image")
+      .order("created_at", {
+        ascending: false,
+      });
 
     if (error) {
-
-      console.error("Banner loading error:", error);
+      console.error(
+        "Banner loading error:",
+        error
+      );
 
       return;
-
     }
 
-
-    setBanners(data as Banner[]);
-
+    setBanners(
+      (data || []) as Banner[]
+    );
   }
 
-
-
-  if (banners.length === 0) return null;
-
-
+  if (banners.length === 0) {
+    return null;
+  }
 
   return (
-
-    <div className="w-full overflow-hidden">
-
-
+    <section
+      className="
+        w-full
+        overflow-hidden
+      "
+    >
       <Swiper
-
-        modules={[Autoplay, Pagination]}
-
+        modules={[
+          Autoplay,
+        ]}
         autoplay={{
-          delay: 3500,
+          delay: 4000,
           disableOnInteraction: false,
         }}
-
-        pagination={{
-          clickable: true,
-        }}
-
-        loop
-
-        spaceBetween={15}
-
+        loop={
+          banners.length > 1
+        }
+        spaceBetween={12}
+        slidesPerView={1}
         className="w-full"
-
       >
-
-
-        {banners.map((banner) => (
-
-          <SwiperSlide
-
-            key={banner.id}
-
-            className="w-full"
-
-          >
-
-
-            <div className="
-              relative
-              w-full
-              overflow-hidden
-              rounded-2xl
-              sm:rounded-3xl
-              shadow-xl
-            ">
-
-
-              <img
-
-                src={banner.image}
-
-                alt={banner.title}
-
+        {banners.map(
+          (banner) => (
+            <SwiperSlide
+              key={banner.id}
+            >
+              <div
                 className="
+                  relative
                   w-full
-                  h-48
-                  sm:h-64
-                  md:h-80
-                  lg:h-[420px]
-                  object-cover
+                  overflow-hidden
+                  rounded-2xl
+                  bg-black
+                  shadow-[0_15px_40px_rgba(15,23,42,0.14)]
+                  sm:rounded-[28px]
+                  lg:rounded-[32px]
                 "
+              >
+                {/* FULL IMAGE */}
 
-              />
-
-
-
-              <div className="
-                absolute
-                inset-0
-                bg-gradient-to-r
-                from-black/70
-                via-black/40
-                to-transparent
-              " />
-
-
-
-
-              <div className="
-                absolute
-                inset-0
-                flex
-                flex-col
-                justify-end
-                p-4
-                sm:p-6
-                md:p-8
-                text-white
-              ">
-
-
-
-                <p className="
-                  text-xs
-                  sm:text-sm
-                  font-semibold
-                  text-orange-300
-                  tracking-wider
-                  uppercase
-                ">
-
-                  Nithesh Cosmetics
-
-                </p>
-
-
-
-
-                <h2 className="
-                  mt-2
-                  text-xl
-                  sm:text-3xl
-                  md:text-4xl
-                  lg:text-5xl
-                  font-extrabold
-                  leading-tight
-                ">
-
-                  {banner.title}
-
-                </h2>
-
-
-
-
-
-                <p className="
-                  mt-2
-                  text-sm
-                  sm:text-base
-                  text-white/90
-                  max-w-md
-                ">
-
-                  {banner.subtitle}
-
-                </p>
-
-
-
-
-
-                <button
-
+                <img
+                  src={
+                    banner.image
+                  }
+                  alt="Nithesh Cosmetics Banner"
                   className="
-                    mt-4
-                    sm:mt-5
-                    w-fit
-                    bg-orange-500
-                    hover:bg-orange-600
-                    transition
-                    px-5
-                    sm:px-6
-                    py-2.5
-                    sm:py-3
-                    rounded-xl
-                    font-semibold
-                    shadow-lg
+                    block
+                    h-auto
+                    w-full
+                    object-contain
                   "
+                />
 
+                {/* SHOP NOW ONLY */}
+
+                <Link
+                  href="/products"
+                  className="
+                    absolute
+                    bottom-3
+                    left-3
+                    z-20
+
+                    inline-flex
+                    items-center
+                    justify-center
+
+                    rounded-full
+                    bg-gradient-to-r
+                    from-orange-500
+                    to-orange-600
+
+                    px-4
+                    py-2
+
+                    text-[11px]
+                    font-black
+                    text-white
+
+                    shadow-[0_8px_25px_rgba(249,115,22,0.45)]
+
+                    transition-all
+                    active:scale-95
+
+                    sm:bottom-5
+                    sm:left-5
+                    sm:px-6
+                    sm:py-3
+                    sm:text-sm
+
+                    lg:bottom-7
+                    lg:left-7
+                    lg:px-7
+                    lg:py-3.5
+                    lg:text-base
+                  "
                 >
-
                   Shop Now →
-
-                </button>
-
-
-
+                </Link>
               </div>
-
-
-            </div>
-
-
-
-          </SwiperSlide>
-
-
-        ))}
-
-
-
+            </SwiperSlide>
+          )
+        )}
       </Swiper>
-
-
-    </div>
-
+    </section>
   );
-
 }
