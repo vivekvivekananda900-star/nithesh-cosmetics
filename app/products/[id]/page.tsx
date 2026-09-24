@@ -418,7 +418,7 @@ export default function ProductDetailsPage() {
               {product.discount ? (
                 <div className="absolute left-4 top-4 z-20 flex items-center gap-1.5 rounded-full bg-red-500 px-3 py-2 text-xs font-black text-white shadow-lg sm:left-5 sm:top-5 sm:px-4">
 
-                  ðŸ”¥ Save â‚¹
+                  🔥 Save ₹
                   {formatPrice(
                     product.discount
                   )}
@@ -620,7 +620,7 @@ export default function ProductDetailsPage() {
                 <div className="mt-1 flex flex-wrap items-end gap-x-3 gap-y-1">
 
                   <span className="text-3xl font-black tracking-tight text-orange-600 sm:text-4xl">
-                    â‚¹
+                    ₹
                     {formatPrice(
                       product.price
                     )}
@@ -630,7 +630,7 @@ export default function ProductDetailsPage() {
                   product.mrp >
                     product.price ? (
                     <span className="pb-1 text-base font-semibold text-gray-400 line-through sm:text-lg">
-                      â‚¹
+                      ₹
                       {formatPrice(
                         product.mrp
                       )}
@@ -641,7 +641,7 @@ export default function ProductDetailsPage() {
 
                 {product.discount ? (
                   <p className="mt-2 text-xs font-bold text-green-600 sm:text-sm">
-                    You save â‚¹
+                    You save ₹
                     {formatPrice(
                       product.discount
                     )}
@@ -725,7 +725,7 @@ export default function ProductDetailsPage() {
                       {product.deliveryFee ===
                       0
                         ? "Free Delivery"
-                        : `Delivery â‚¹${product.deliveryFee}`}
+                        : `Delivery ₹${product.deliveryFee}`}
                     </p>
 
                     <p className="mt-0.5 text-[11px] text-gray-500">
@@ -816,7 +816,7 @@ export default function ProductDetailsPage() {
                   }
                   className="group flex min-h-14 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 px-4 font-black text-white shadow-[0_12px_30px_rgba(249,115,22,0.28)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_16px_36px_rgba(249,115,22,0.36)] active:scale-[0.98] disabled:cursor-not-allowed disabled:from-gray-300 disabled:to-gray-400 disabled:shadow-none"
                 >
-                  âš¡ Buy Now
+                  ⚡ Buy Now
                 </button>
 
               </div>
@@ -884,7 +884,7 @@ export default function ProductDetailsPage() {
 
                         {item.discount ? (
                           <span className="absolute left-2 top-2 z-10 rounded-full bg-red-500 px-2 py-1 text-[9px] font-black text-white sm:text-[10px]">
-                            Save â‚¹
+                            Save ₹
                             {
                               item.discount
                             }
@@ -945,7 +945,7 @@ export default function ProductDetailsPage() {
                       <div className="mt-2 flex flex-wrap items-end gap-1.5">
 
                         <p className="text-lg font-black text-orange-600 sm:text-xl">
-                          â‚¹
+                          ₹
                           {formatPrice(
                             item.price
                           )}
@@ -955,7 +955,7 @@ export default function ProductDetailsPage() {
                         item.mrp >
                           item.price ? (
                           <span className="pb-0.5 text-[10px] text-gray-400 line-through sm:text-xs">
-                            â‚¹
+                            ₹
                             {formatPrice(
                               item.mrp
                             )}
@@ -1038,7 +1038,7 @@ export default function ProductDetailsPage() {
             onClick={handleBuyNow}
             className="flex min-h-13 items-center justify-center rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 px-3 text-sm font-black text-white shadow-[0_8px_24px_rgba(249,115,22,0.28)] transition-all active:scale-95 disabled:from-gray-300 disabled:to-gray-400"
           >
-            âš¡ Buy Now
+            ⚡ Buy Now
           </button>
 
         </div>
